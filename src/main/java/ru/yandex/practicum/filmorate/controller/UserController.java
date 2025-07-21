@@ -1,59 +1,39 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
-@Slf4j
+@RequiredArgsConstructor
 public class UserController {
-    private static int currentId = 1;
-
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService service;
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        checkName(user);
-        user.setId(getNextId());
-        users.put(user.getId(), user);
+        User created = service.create(user);
         log.info("Пользователь успешно создан, id={}", user.getId());
 
-        return user;
+        return created;
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        if (!users.containsKey(user.getId())) {
-            String message = "Пользователь с id=" + user.getId() + " не найден";
-            log.warn(message);
-            throw new NotFoundException(message);
-        }
-        checkName(user);
-        users.put(user.getId(), user);
+        User updated = service.update(user);
         log.info("Пользователь с id={} успешно обновлён", user.getId());
 
-        return user;
+        return updated;
     }
 
     @GetMapping
-    public Collection<User> get() {
-        return users.values();
-    }
-
-    private static synchronized int getNextId() {
-        return currentId++;
-    }
-
-    private static void checkName(User user) {
-        if ((user.getName() == null) || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    public List<User> get() {
+        return service.getAll();
     }
 }
