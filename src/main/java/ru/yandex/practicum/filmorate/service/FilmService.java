@@ -1,43 +1,26 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.abstraction.FilmStorage;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
-    private static int id = 1;
-    private final Map<Integer, Film> films;
-
-    public FilmService() {
-        films = new HashMap<>();
-    }
+    private final FilmStorage storage;
 
     public List<Film> getAll() {
-        return films.values().stream().toList();
+        return storage.getAll();
     }
 
     public Film create(Film film) {
-        film.setId(nextId());
-        films.put(film.getId(), film);
-
-        return film;
+        return storage.create(film);
     }
 
     public Film update(Film film) {
-        if (!films.containsKey(film.getId())) {
-            throw new NotFoundException("Фильм с id=" + film.getId() + " не найден");
-        }
-        films.put(film.getId(), film);
-
-        return film;
-    }
-
-    private static synchronized int nextId() {
-        return id++;
+        return storage.update(film);
     }
 }
