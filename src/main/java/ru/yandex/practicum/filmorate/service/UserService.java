@@ -17,8 +17,11 @@ public class UserService {
         return storage.getAll();
     }
 
-    public Optional<User> get(int userId) {
-        return storage.get(userId);
+    public User get(int userId) {
+        return Storages.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+                "Пользователь с id=%d не найден",
+                userId
+        ));
     }
 
     public User create(User user) {

@@ -22,4 +22,10 @@ public class GlobalExceptionAdvice {
         log.warn("Возникло исключение валидации: ", exception);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exception.getMessage()));
     }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorResponse> handleThrowable(Throwable throwable) {
+        log.error("Возникла непредвиденная ошибка: ", throwable);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Внутренняя ошибка сервера"));
+    }
 }

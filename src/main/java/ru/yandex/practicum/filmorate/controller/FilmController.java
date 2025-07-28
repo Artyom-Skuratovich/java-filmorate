@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -40,7 +39,7 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public Optional<Film> get(@PathVariable int filmId) {
+    public Film get(@PathVariable int filmId) {
         log.info("GET-запрос на получение фильма, id={}", filmId);
         return service.get(filmId);
     }
@@ -58,9 +57,9 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public void removeLike(@PathVariable int filmId, @PathVariable int userId) {
+    public Film removeLike(@PathVariable int filmId, @PathVariable int userId) {
         log.info("DELETE-запрос на удаление лайка фильма, filmId={}, userId={}", filmId, userId);
-        service.removeLike(filmId, userId);
+        return service.removeLike(filmId, userId);
     }
 
     @GetMapping("/popular")

@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.storage.abstraction.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +22,11 @@ public class FilmService {
         return filmStorage.getAll();
     }
 
-    public Optional<Film> get(int filmId) {
-        return filmStorage.get(filmId);
+    public Film get(int filmId) {
+        return Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+                "Фильм с id=%d не найден",
+                filmId
+        ));
     }
 
     public Film create(Film film) {
