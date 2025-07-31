@@ -14,7 +14,7 @@ SELECT f.Id,
        f.Duration,
        r.Name AS Rating
 FROM Films AS f
-INNER JOIN Ratings AS r ON f.RatingId = r.Id
+INNER JOIN AgeRatings AS r ON f.AgeRatingId = r.Id
 WHERE f.Id IN (SELECT FilmId
 	       FROM Likes
 	       GROUP BY FilmId
@@ -26,19 +26,19 @@ WHERE f.Id IN (SELECT FilmId
 ```sql
 SELECT u.*
 FROM Users AS u
-INNER JOIN Friends AS f ON u.Id = f.SecondUserId
-WHERE f.FirstUserId = 1 AND f.Confirmed = True;
+INNER JOIN Friends AS f ON u.Id = f.FriendId
+WHERE f.UserId = 1 AND f.Confirmed = True;
 ```
 
 ### Получение общих друзей для пользователей с _Id_ = 1 и _Id_ = 2
 ```sql
 SELECT u.*
 	FROM Users AS u
-	INNER JOIN Friends AS f ON u.Id = f.SecondUserId
-	WHERE f.FirstUserId = 1 AND f.Confirmed = True
+	INNER JOIN Friends AS f ON u.Id = f.FriendId
+	WHERE f.UserId = 1 AND f.Confirmed = True
 INTERSECT
 SELECT u.*
 	FROM Users AS u
-	INNER JOIN Friends AS f ON u.Id = f.SecondUserId
-	WHERE f.FirstUserId = 2 AND f.Confirmed = True;
+	INNER JOIN Friends AS f ON u.Id = f.FriendId
+	WHERE f.UserId = 2 AND f.Confirmed = True;
 ```
