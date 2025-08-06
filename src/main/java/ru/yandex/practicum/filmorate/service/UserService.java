@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.Storages;
+import ru.yandex.practicum.filmorate.storage.StorageUtils;
 import ru.yandex.practicum.filmorate.storage.abstraction.UserStorage;
 
 import java.util.*;
@@ -18,7 +18,7 @@ public class UserService {
     }
 
     public User get(int userId) {
-        return Storages.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+        return StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Пользователь с id=%d не найден",
                 userId
         ));
@@ -39,11 +39,11 @@ public class UserService {
     }
 
     public User addFriend(int userId, int friendId) {
-        User user = Storages.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Не удалось добавить друга пользователю с id=%d, так как такого пользователя не существует",
                 userId
         ));
-        User friend = Storages.getUserOrThrowIfDoesNotExist(storage, friendId, String.format(
+        User friend = StorageUtils.getUserOrThrowIfDoesNotExist(storage, friendId, String.format(
                 "Не удалось добавить друга с id=%d, так как такого пользователя не существует",
                 friendId
         ));
@@ -54,11 +54,11 @@ public class UserService {
     }
 
     public User removeFriend(int userId, int friendId) {
-        User user = Storages.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Не удалось удалить друга у пользователя с id=%d, так как такого пользователя не существует",
                 userId
         ));
-        User friend = Storages.getUserOrThrowIfDoesNotExist(storage, friendId, String.format(
+        User friend = StorageUtils.getUserOrThrowIfDoesNotExist(storage, friendId, String.format(
                 "Не удалось удалить друга с id=%d, так как такого пользователя не существует",
                 friendId
         ));
@@ -70,12 +70,12 @@ public class UserService {
 
     public List<User> getCommonFriends(int firstUserId, int secondUserId) {
         String errorMessage = "Пользователь с id=%d не найден";
-        User firstUser = Storages.getUserOrThrowIfDoesNotExist(
+        User firstUser = StorageUtils.getUserOrThrowIfDoesNotExist(
                 storage,
                 firstUserId,
                 String.format(errorMessage, firstUserId)
         );
-        User secondUser = Storages.getUserOrThrowIfDoesNotExist(
+        User secondUser = StorageUtils.getUserOrThrowIfDoesNotExist(
                 storage,
                 secondUserId,
                 String.format(errorMessage, secondUserId)
@@ -87,7 +87,7 @@ public class UserService {
     }
 
     public List<User> getFriends(int userId) {
-        User user = Storages.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Не удалось получить список друзей для несуществующего пользователя, id=%d",
                 userId
         ));

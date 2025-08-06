@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.Storages;
+import ru.yandex.practicum.filmorate.storage.StorageUtils;
 import ru.yandex.practicum.filmorate.storage.abstraction.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.abstraction.UserStorage;
 
@@ -23,7 +23,7 @@ public class FilmService {
     }
 
     public Film get(int filmId) {
-        return Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+        return StorageUtils.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
                 "Фильм с id=%d не найден",
                 filmId
         ));
@@ -42,11 +42,11 @@ public class FilmService {
     }
 
     public Film addLike(int filmId, int userId) {
-        Film film = Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+        Film film = StorageUtils.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
                 "Не удалось поставить лайк фильму с id=%d, так как такого фильма не существует",
                 filmId
         ));
-        User user = Storages.getUserOrThrowIfDoesNotExist(userStorage, userId, String.format(
+        User user = StorageUtils.getUserOrThrowIfDoesNotExist(userStorage, userId, String.format(
                 "Не удалось поставить лайк фильму, так как пользователя с id=%d не существует",
                 userId
         ));
@@ -55,7 +55,7 @@ public class FilmService {
     }
 
     public Film removeLike(int filmId, int userId) {
-        Film film = Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+        Film film = StorageUtils.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
                 "Не удалось поставить лайк фильму с id=%d, так как такого фильма не существует",
                 filmId
         ));
