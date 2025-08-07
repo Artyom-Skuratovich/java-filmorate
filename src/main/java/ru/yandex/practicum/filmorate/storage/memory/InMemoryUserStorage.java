@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.memory;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.abstraction.UserStorage;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@Deprecated
 public class InMemoryUserStorage implements UserStorage {
     private static int id = 1;
     private final Map<Integer, User> users;
@@ -26,6 +25,21 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> findCommonFriends(int firstUserId, int secondUserId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<User> findFriends(int userId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addFriend(int userId, int friendId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteFriend(int userId, int friendId) {
         throw new UnsupportedOperationException();
     }
 

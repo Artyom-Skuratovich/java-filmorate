@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.StorageUtils;
@@ -11,14 +12,15 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Qualifier("userDbStorage")
     private final UserStorage storage;
 
-    public List<User> getAll() {
-        return storage.getAll();
+    public List<User> findAll() {
+        return storage.findAll();
     }
 
-    public User get(int userId) {
-        return StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+    public User find(int userId) {
+        return StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Пользователь с id=%d не найден",
                 userId
         ));
@@ -39,68 +41,57 @@ public class UserService {
     }
 
     public User addFriend(int userId, int friendId) {
-        User user = StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Не удалось добавить друга пользователю с id=%d, так как такого пользователя не существует",
                 userId
         ));
-        User friend = StorageUtils.getUserOrThrowIfDoesNotExist(storage, friendId, String.format(
+        User friend = StorageUtils.findModelOrThrowIfDoesNotExist(storage, friendId, String.format(
                 "Не удалось добавить друга с id=%d, так как такого пользователя не существует",
                 friendId
         ));
-        friend.getFriends().add(userId);
-        storage.update(friend);
-        user.getFriends().add(friendId);
-        return storage.update(user);
+        storage.addFriend(user.getId(), friend.getId());
+        return user;
     }
 
-    public User removeFriend(int userId, int friendId) {
-        User user = StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+    public User deleteFriend(int userId, int friendId) {
+        User user = StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Не удалось удалить друга у пользователя с id=%d, так как такого пользователя не существует",
                 userId
         ));
-        User friend = StorageUtils.getUserOrThrowIfDoesNotExist(storage, friendId, String.format(
+        User friend = StorageUtils.findModelOrThrowIfDoesNotExist(storage, friendId, String.format(
                 "Не удалось удалить друга с id=%d, так как такого пользователя не существует",
                 friendId
         ));
-        friend.getFriends().remove(userId);
-        storage.update(friend);
-        user.getFriends().remove(friendId);
-        return storage.update(user);
+        storage.deleteFriend(user.getId(), friend.getId());
+        return user;
     }
 
-    public List<User> getCommonFriends(int firstUserId, int secondUserId) {
+    public List<User> findCommonFriends(int firstUserId, int secondUserId) {
         String errorMessage = "Пользователь с id=%d не найден";
-        User firstUser = StorageUtils.getUserOrThrowIfDoesNotExist(
+        User firstUser = StorageUtils.findModelOrThrowIfDoesNotExist(
                 storage,
                 firstUserId,
                 String.format(errorMessage, firstUserId)
         );
-        User secondUser = StorageUtils.getUserOrThrowIfDoesNotExist(
+        User secondUser = StorageUtils.findModelOrThrowIfDoesNotExist(
                 storage,
                 secondUserId,
                 String.format(errorMessage, secondUserId)
         );
-
-        Set<Integer> commonFriends = new HashSet<>(firstUser.getFriends());
-        commonFriends.retainAll(secondUser.getFriends());
-        return getUsersFromIds(commonFriends);
+        return storage.findCommonFriends(firstUser.getId(), secondUser.getId());
     }
 
-    public List<User> getFriends(int userId) {
-        User user = StorageUtils.getUserOrThrowIfDoesNotExist(storage, userId, String.format(
+    public List<User> findFriends(int userId) {
+        User user = StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
                 "Не удалось получить список друзей для несуществующего пользователя, id=%d",
                 userId
         ));
-        return getUsersFromIds(user.getFriends());
+        return storage.findFriends(user.getId());
     }
 
     private void checkName(User user) {
         if ((user.getName() == null) || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-    }
-
-    private List<User> getUsersFromIds(Collection<Integer> ids) {
-        return ids.stream().map(storage::get).flatMap(Optional::stream).toList();
     }
 }

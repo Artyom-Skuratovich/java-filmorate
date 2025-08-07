@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.memory;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.abstraction.FilmStorage;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@Deprecated
 public class InMemoryFilmStorage implements FilmStorage {
     private static int id = 1;
     private final Map<Integer, Film> films;
@@ -21,6 +20,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findMostPopularFilms(int count) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addLike(int filmId, int userId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean deleteLike(int filmId, int userId) {
         throw new UnsupportedOperationException();
     }
 

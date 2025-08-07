@@ -35,13 +35,13 @@ public class UserController {
     @GetMapping
     public List<User> getAll() {
         log.info("GET-запрос на получение списка всех пользователей");
-        return service.getAll();
+        return service.findAll();
     }
 
     @GetMapping("/{userId}")
     public User get(@PathVariable int userId) {
         log.info("GET-запрос на получение пользователя, id={}", userId);
-        return service.get(userId);
+        return service.find(userId);
     }
 
     @DeleteMapping("/{userId}")
@@ -59,18 +59,18 @@ public class UserController {
     @DeleteMapping("/{userId}/friends/{friendId}")
     public User removeFriend(@PathVariable int userId, @PathVariable int friendId) {
         log.info("DELETE-запрос на удаление друга, userId={}, friendId={}", userId, friendId);
-        return service.removeFriend(userId, friendId);
+        return service.deleteFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")
     public List<User> getFriends(@PathVariable int userId) {
         log.info("GET-запрос на получение списка друзей, userId={}", userId);
-        return service.getFriends(userId);
+        return service.findFriends(userId);
     }
 
     @GetMapping("/{userId}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable int userId, @PathVariable int otherId) {
         log.info("GET-запрос на получение списка общих друзей, userId={}, otherId={}", userId, otherId);
-        return service.getCommonFriends(userId, otherId);
+        return service.findCommonFriends(userId, otherId);
     }
 }
