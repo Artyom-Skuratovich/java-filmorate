@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage {
-    private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM genres ORDER BY id";
     private static final String FIND_QUERY = "SELECT * FROM genres WHERE id = ?";
     private static final String FIND_GENRES_FOR_FILM_QUERY = """
             SELECT g.*

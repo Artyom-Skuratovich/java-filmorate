@@ -15,20 +15,20 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String FIND_MOST_POPULAR_FILMS_QUERY = """
             SELECT f.*
-              FROM films AS f
-              JOIN likes AS l ON f.id = l.film_id
-              GROUP BY f.id
-              ORDER BY COUNT(l.film_id) DESC
-              LIMIT ?;
+            FROM films AS f
+            JOIN likes AS l ON f.id = l.film_id
+            GROUP BY f.id
+            ORDER BY COUNT(l.film_id) DESC
+            LIMIT ?;
             """;
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String UPDATE_QUERY = """
             UPDATE films
-            SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?
+            SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ?
             WHERE id = ?
             """;
     private static final String CREATE_QUERY = """
-            INSERT INTO films (name, description, release_date, duration, mpa_rating_id)
+            INSERT INTO films (name, description, release_date, duration, mpa_id)
             VALUES (?, ?, ?, ?, ?)
             """;
     private static final String ADD_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";

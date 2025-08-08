@@ -56,7 +56,9 @@ public class FilmService {
         ));
         checkGenres(request.getGenres());
         Film film = filmStorage.create(FilmMapper.mapToFilm(request));
-        request.getGenres().forEach(g -> genreStorage.addGenreToFilm(film.getId(), g.getId()));
+        if (request.getGenres() != null) {
+            request.getGenres().forEach(g -> genreStorage.addGenreToFilm(film.getId(), g.getId()));
+        }
         return FilmMapper.mapToFilmDto(film, mpa, genreStorage.findGenresForFilm(film.getId()));
     }
 
@@ -130,11 +132,13 @@ public class FilmService {
         genresForDelete.forEach(g -> genreStorage.deleteGenreFromFilm(filmId, g));
     }
 
-    private void checkGenres(List<Genre> genres) {
-        genres.forEach(g -> StorageUtils.findModel(genreStorage, g.getId(), String.format(
-                "Жанр с id=%d не найден",
-                g.getId()
-        )));
+    private void checkGenres(Set<Genre> genres) {
+        if (genres != null) {
+            genres.forEach(g -> StorageUtils.findModel(genreStorage, g.getId(), String.format(
+                    "Жанр с id=%d не найден",
+                    g.getId()
+            )));
+        }
     }
 
     private FilmDto buildDto(Film film) {

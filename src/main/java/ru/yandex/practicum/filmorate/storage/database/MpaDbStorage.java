@@ -11,7 +11,8 @@ import java.util.Optional;
 
 @Repository
 public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
-    private static final String FIND_QUERY = "SELECT * FROM mpa_ratings WHERE id = ?";
+    private static final String FIND_QUERY = "SELECT * FROM mpa WHERE id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM mpa ORDER BY id";
 
     public MpaDbStorage(JdbcTemplate jdbc, RowMapper<Mpa> mapper) {
         super(jdbc, mapper);
@@ -19,12 +20,12 @@ public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
 
     @Override
     public Mpa create(Mpa model) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Mpa> findAll() {
-        return List.of();
+        return findMany(FIND_ALL_QUERY);
     }
 
     @Override
@@ -34,11 +35,11 @@ public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
 
     @Override
     public Mpa update(Mpa model) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void delete(int id) {
-
+        throw new UnsupportedOperationException();
     }
 }

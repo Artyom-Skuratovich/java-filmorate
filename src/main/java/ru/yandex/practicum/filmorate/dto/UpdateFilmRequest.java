@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.annotation.ReleaseDate;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class UpdateFilmRequest {
@@ -30,5 +30,5 @@ public class UpdateFilmRequest {
 
     private Integer rate;
 
-    private List<Genre> genres;
+    private Set<Genre> genres;
 }

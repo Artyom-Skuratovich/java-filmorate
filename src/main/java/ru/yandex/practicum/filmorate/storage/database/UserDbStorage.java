@@ -15,32 +15,32 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String FIND_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String FIND_UNCONFIRMED_FRIEND_REQUESTS_QUERY = """
             SELECT *
-                FROM users
-                WHERE id IN (
-                    SELECT f.user_id
-                    FROM friends AS f
-                    WHERE f.friend_id = ? AND NOT EXISTS (
-                        SELECT 1
-                        FROM friends AS f2
-                        WHERE f2.user_id = ? AND f2.friend_id = f.user_id
-                    )
-                );
+            FROM users
+            WHERE id IN (
+                SELECT f.user_id
+                FROM friends AS f
+                WHERE f.friend_id = ? AND NOT EXISTS (
+                    SELECT 1
+                    FROM friends AS f2
+                    WHERE f2.user_id = ? AND f2.friend_id = f.user_id
+                )
+            );
             """;
     private static final String FIND_COMMON_FRIENDS_QUERY = """
             SELECT u.*
-            FROM users AS u
-            INNER JOIN friends ON u.id = friend_id
-            WHERE user_id = ?
+                FROM users AS u
+                JOIN friends ON u.id = friend_id
+                WHERE user_id = ?
             INTERSECT
             SELECT u.*
-            FROM users AS u
-            INNER JOIN friends ON u.id = friend_id
-            WHERE user_id = ?
+                FROM users AS u
+                JOIN friends ON u.id = friend_id
+                WHERE user_id = ?
             """;
     private static final String FIND_FRIENDS_QUERY = """
             SELECT u.*
             FROM users AS u
-            INNER JOIN friends ON u.id = friend_id
+            JOIN friends ON u.id = friend_id
             WHERE user_id = ?
             """;
     private static final String DELETE_QUERY = "DELETE FROM users WHERE id = ?";
