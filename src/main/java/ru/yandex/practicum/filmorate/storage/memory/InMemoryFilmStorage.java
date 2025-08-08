@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.memory;
 
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.abstraction.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Deprecated
+@Service
 public class InMemoryFilmStorage implements FilmStorage {
     private static int id = 1;
     private final Map<Integer, Film> films;

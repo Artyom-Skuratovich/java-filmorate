@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.dal.mapper;
+package ru.yandex.practicum.filmorate.storage.database.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setDuration(rs.getInt("duration"));
         film.setName(rs.getString("name"));
         film.setDescription(rs.getString("description"));
-        film.setMpaRatingId(rs.getInt("mpa_rating_id"));
+        film.setMpaId(rs.getInt("mpa_rating_id"));
 
         Timestamp releaseDate = rs.getTimestamp("release_date");
         film.setReleaseDate(releaseDate.toLocalDateTime().toLocalDate());

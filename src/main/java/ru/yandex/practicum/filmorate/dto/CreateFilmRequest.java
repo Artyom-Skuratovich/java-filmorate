@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.annotation.ReleaseDate;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +31,7 @@ public class CreateFilmRequest {
     private Integer duration;
 
     @NotNull
-    private MpaRating mpa;
+    private Mpa mpa;
 
     private List<Genre> genres;
 }

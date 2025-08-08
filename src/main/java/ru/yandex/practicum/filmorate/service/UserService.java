@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.StorageUtils;
-import ru.yandex.practicum.filmorate.storage.abstraction.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 
@@ -20,7 +20,7 @@ public class UserService {
     }
 
     public User find(int userId) {
-        return StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
+        return StorageUtils.findModel(storage, userId, String.format(
                 "Пользователь с id=%d не найден",
                 userId
         ));
@@ -41,11 +41,11 @@ public class UserService {
     }
 
     public User addFriend(int userId, int friendId) {
-        User user = StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.findModel(storage, userId, String.format(
                 "Не удалось добавить друга пользователю с id=%d, так как такого пользователя не существует",
                 userId
         ));
-        User friend = StorageUtils.findModelOrThrowIfDoesNotExist(storage, friendId, String.format(
+        User friend = StorageUtils.findModel(storage, friendId, String.format(
                 "Не удалось добавить друга с id=%d, так как такого пользователя не существует",
                 friendId
         ));
@@ -54,11 +54,11 @@ public class UserService {
     }
 
     public User deleteFriend(int userId, int friendId) {
-        User user = StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.findModel(storage, userId, String.format(
                 "Не удалось удалить друга у пользователя с id=%d, так как такого пользователя не существует",
                 userId
         ));
-        User friend = StorageUtils.findModelOrThrowIfDoesNotExist(storage, friendId, String.format(
+        User friend = StorageUtils.findModel(storage, friendId, String.format(
                 "Не удалось удалить друга с id=%d, так как такого пользователя не существует",
                 friendId
         ));
@@ -68,12 +68,12 @@ public class UserService {
 
     public List<User> findCommonFriends(int firstUserId, int secondUserId) {
         String errorMessage = "Пользователь с id=%d не найден";
-        User firstUser = StorageUtils.findModelOrThrowIfDoesNotExist(
+        User firstUser = StorageUtils.findModel(
                 storage,
                 firstUserId,
                 String.format(errorMessage, firstUserId)
         );
-        User secondUser = StorageUtils.findModelOrThrowIfDoesNotExist(
+        User secondUser = StorageUtils.findModel(
                 storage,
                 secondUserId,
                 String.format(errorMessage, secondUserId)
@@ -82,7 +82,7 @@ public class UserService {
     }
 
     public List<User> findFriends(int userId) {
-        User user = StorageUtils.findModelOrThrowIfDoesNotExist(storage, userId, String.format(
+        User user = StorageUtils.findModel(storage, userId, String.format(
                 "Не удалось получить список друзей для несуществующего пользователя, id=%d",
                 userId
         ));

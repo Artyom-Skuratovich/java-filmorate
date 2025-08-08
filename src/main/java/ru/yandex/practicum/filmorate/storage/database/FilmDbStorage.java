@@ -1,10 +1,10 @@
-package ru.yandex.practicum.filmorate.storage.dal;
+package ru.yandex.practicum.filmorate.storage.database;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.abstraction.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 model.getDescription(),
                 model.getReleaseDate(),
                 model.getDuration(),
-                model.getMpaRatingId()
+                model.getMpaId()
         );
         model.setId(id);
         return model;
@@ -85,7 +85,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 model.getDescription(),
                 model.getReleaseDate(),
                 model.getDuration(),
-                model.getMpaRatingId(),
+                model.getMpaId(),
                 model.getId()
         );
         return model;

@@ -1,39 +1,39 @@
-package ru.yandex.practicum.filmorate.storage.dal;
+package ru.yandex.practicum.filmorate.storage.database;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.storage.abstraction.MpaStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class MpaDbStorage extends BaseDbStorage<MpaRating> implements MpaStorage {
+public class MpaDbStorage extends BaseDbStorage<Mpa> implements MpaStorage {
     private static final String FIND_QUERY = "SELECT * FROM mpa_ratings WHERE id = ?";
 
-    public MpaDbStorage(JdbcTemplate jdbc, RowMapper<MpaRating> mapper) {
+    public MpaDbStorage(JdbcTemplate jdbc, RowMapper<Mpa> mapper) {
         super(jdbc, mapper);
     }
 
     @Override
-    public MpaRating create(MpaRating model) {
+    public Mpa create(Mpa model) {
         return null;
     }
 
     @Override
-    public List<MpaRating> findAll() {
+    public List<Mpa> findAll() {
         return List.of();
     }
 
     @Override
-    public Optional<MpaRating> find(int id) {
+    public Optional<Mpa> find(int id) {
         return findOne(FIND_QUERY, id);
     }
 
     @Override
-    public MpaRating update(MpaRating model) {
+    public Mpa update(Mpa model) {
         return null;
     }
 
