@@ -3,6 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.CreateUserRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.StorageUtils;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -26,14 +29,18 @@ public class UserService {
         ));
     }
 
-    public User create(User user) {
+    public User create(CreateUserRequest request) {
+        User user = UserMapper.mapToUser(request);
         checkName(user);
         return storage.create(user);
     }
 
-    public User update(User user) {
-        checkName(user);
-        return storage.update(user);
+    public User update(UpdateUserRequest request) {
+        User user = StorageUtils.findModel(storage, request.getId(), String.format(
+                "Пользователь с id=%d не найден",
+                request.getId()
+        ));
+        return storage.update(UserMapper.updateUserProperties(user, request));
     }
 
     public void delete(int userId) {

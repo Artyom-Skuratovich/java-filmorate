@@ -14,7 +14,7 @@ import java.util.Set;
 @Data
 public class UpdateFilmRequest {
     @NotNull
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Название не может быть пустым")
     private String name;
