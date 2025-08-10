@@ -1,79 +1,152 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.Storages;
-import ru.yandex.practicum.filmorate.storage.abstraction.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.abstraction.UserStorage;
+import ru.yandex.practicum.filmorate.storage.StorageUtils;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class FilmService {
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    private final GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
 
-    public List<Film> getAll() {
-        return filmStorage.getAll();
+    public List<FilmDto> findAll() {
+        return filmStorage.findAll()
+                .stream()
+                .map(this::buildDto)
+                .toList();
     }
 
-    public Film get(int filmId) {
-        return Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+    public FilmDto find(int filmId) {
+        Film film = StorageUtils.findModel(filmStorage, filmId, String.format(
                 "Фильм с id=%d не найден",
                 filmId
         ));
+        Mpa mpa = StorageUtils.findModel(mpaStorage, film.getMpaId(), String.format(
+                "MPA-рейтинг с id=%d не найден",
+                film.getMpaId()
+        ));
+        return FilmMapper.mapToFilmDto(film, mpa, genreStorage.findGenresForFilm(filmId));
     }
 
-    public Film create(Film film) {
-        return filmStorage.create(film);
+    public FilmDto create(CreateFilmRequest request) {
+        Mpa mpa = StorageUtils.findModel(mpaStorage, request.getMpa().getId(), String.format(
+                "MPA-рейтинг с id=%d не найден",
+                request.getMpa().getId()
+        ));
+        checkGenres(request.getGenres());
+        Film film = filmStorage.create(FilmMapper.mapToFilm(request));
+        if (request.getGenres() != null) {
+            request.getGenres().forEach(g -> genreStorage.addGenreToFilm(film.getId(), g.getId()));
+        }
+        return FilmMapper.mapToFilmDto(film, mpa, genreStorage.findGenresForFilm(film.getId()));
     }
 
-    public Film update(Film film) {
-        return filmStorage.update(film);
+    public FilmDto update(UpdateFilmRequest request) {
+        Film film = StorageUtils.findModel(filmStorage, request.getId(), String.format(
+                "Фильм с id=%d не найден",
+                request.getId()
+        ));
+        Mpa mpa = StorageUtils.findModel(mpaStorage, request.getRate(), String.format(
+                "MPA-рейтинг с id=%d не найден",
+                request.getRate()
+        ));
+        film = filmStorage.update(FilmMapper.updateFilmProperties(film, request));
+        if (request.getGenres() != null) {
+            updateGenresForFilm(film.getId(), request.getGenres().stream().map(Genre::getId).toList());
+        }
+        return FilmMapper.mapToFilmDto(film, mpa, genreStorage.findGenresForFilm(film.getId()));
     }
 
     public void delete(int filmId) {
         filmStorage.delete(filmId);
     }
 
-    public Film addLike(int filmId, int userId) {
-        Film film = Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+    public FilmDto addLike(int filmId, int userId) {
+        Film film = StorageUtils.findModel(filmStorage, filmId, String.format(
                 "Не удалось поставить лайк фильму с id=%d, так как такого фильма не существует",
                 filmId
         ));
-        User user = Storages.getUserOrThrowIfDoesNotExist(userStorage, userId, String.format(
+        User user = StorageUtils.findModel(userStorage, userId, String.format(
                 "Не удалось поставить лайк фильму, так как пользователя с id=%d не существует",
                 userId
         ));
-        film.getLikes().add(user.getId());
-        return filmStorage.update(film);
+        filmStorage.addLike(film.getId(), user.getId());
+        return buildDto(film);
     }
 
-    public Film removeLike(int filmId, int userId) {
-        Film film = Storages.getFilmOrThrowIfDoesNotExist(filmStorage, filmId, String.format(
+    public FilmDto deleteLike(int filmId, int userId) {
+        Film film = StorageUtils.findModel(filmStorage, filmId, String.format(
                 "Не удалось поставить лайк фильму с id=%d, так как такого фильма не существует",
                 filmId
         ));
-        if (!film.getLikes().contains(userId)) {
+        if (!filmStorage.deleteLike(filmId, userId)) {
             throw new NotFoundException(String.format(
-                    "Не удалось удалить лайк фильму с id=%d, так как пользователя с id=%d не существует",
+                    "Не удалось удалить лайк фильму с id=%d, так как пользователь с id=%d не ставил лайк",
                     filmId,
                     userId
             ));
         }
-        film.getLikes().remove(userId);
-        return filmStorage.update(film);
+        return buildDto(film);
     }
 
-    public List<Film> getMostPopularFilms(int count) {
-        return filmStorage.getAll().stream()
-                .sorted(Comparator.comparingInt(f -> ((Film) f).getLikes().size()).reversed())
-                .limit(count)
+    public List<FilmDto> findMostPopularFilms(int count) {
+        return filmStorage.findMostPopularFilms(count)
+                .stream()
+                .map(this::buildDto)
                 .toList();
+    }
+
+    private void updateGenresForFilm(int filmId, List<Integer> genres) {
+        List<Integer> currentGenres = genreStorage.findGenresForFilm(filmId).stream().map(Genre::getId).toList();
+        List<Integer> genresForCreate = new ArrayList<>();
+        Set<Integer> genresForDelete = new HashSet<>(currentGenres);
+
+        for (Integer genreId : genres) {
+            if (!currentGenres.contains(genreId)) {
+                genresForCreate.add(genreId);
+            }
+        }
+        genres.forEach(genresForDelete::remove);
+        genresForCreate.forEach(g -> genreStorage.addGenreToFilm(filmId, g));
+        genresForDelete.forEach(g -> genreStorage.deleteGenreFromFilm(filmId, g));
+    }
+
+    private void checkGenres(Set<Genre> genres) {
+        if (genres != null) {
+            genres.forEach(g -> StorageUtils.findModel(genreStorage, g.getId(), String.format(
+                    "Жанр с id=%d не найден",
+                    g.getId()
+            )));
+        }
+    }
+
+    private FilmDto buildDto(Film film) {
+        Optional<Mpa> mpa = mpaStorage.find(film.getMpaId());
+        return FilmMapper.mapToFilmDto(
+                film,
+                mpa.orElseThrow(() -> new NotFoundException(String.format("MPA с id=%d не найден", film.getMpaId()))),
+                genreStorage.findGenresForFilm(film.getId())
+        );
     }
 }
