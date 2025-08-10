@@ -18,18 +18,10 @@ public final class UserMapper {
     }
 
     public static User updateUserProperties(User user, UpdateUserRequest request) {
-        if (request.getEmail() != null) {
-            user.setEmail(request.getEmail());
-        }
-        if (request.getBirthday() != null) {
-            user.setBirthday(request.getBirthday());
-        }
-        if (request.getLogin() != null) {
-            user.setLogin(request.getLogin());
-        }
-        if (request.getName() != null) {
-            user.setName(request.getName());
-        }
+        user.setEmail(request.getEmail());
+        user.setBirthday(request.getBirthday());
+        user.setLogin(request.getLogin());
+        user.setName(request.getName());
         return user;
     }
 }

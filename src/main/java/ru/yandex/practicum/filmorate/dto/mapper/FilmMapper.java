@@ -38,21 +38,11 @@ public final class FilmMapper {
     }
 
     public static Film updateFilmProperties(Film film, UpdateFilmRequest request) {
-        if (request.getName() != null) {
-            film.setName(request.getName());
-        }
-        if (request.getDescription() != null) {
-            film.setDescription(request.getDescription());
-        }
-        if (request.getReleaseDate() != null) {
-            film.setReleaseDate(request.getReleaseDate());
-        }
-        if (request.getDuration() != null) {
-            film.setDuration(request.getDuration());
-        }
-        if (request.getRate() != null) {
-            film.setMpaId(request.getRate());
-        }
+        film.setName(request.getName());
+        film.setDescription(request.getDescription());
+        film.setReleaseDate(request.getReleaseDate());
+        film.setDuration(request.getDuration());
+        film.setMpaId(request.getRate());
         return film;
     }
 }

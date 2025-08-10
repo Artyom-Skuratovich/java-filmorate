@@ -40,7 +40,8 @@ public class UserService {
                 "Пользователь с id=%d не найден",
                 request.getId()
         ));
-        return storage.update(UserMapper.updateUserProperties(user, request));
+        checkName(UserMapper.updateUserProperties(user, request));
+        return storage.update(user);
     }
 
     public void delete(int userId) {
