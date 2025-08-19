@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.annotation.ReleaseDate;
+import ru.yandex.practicum.filmorate.util.annotation.ReleaseDate;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
