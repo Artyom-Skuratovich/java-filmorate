@@ -7,9 +7,10 @@ import ru.yandex.practicum.filmorate.model.Operation;
 import java.util.List;
 
 public interface EventService {
-    // Добавить событие
+
+    // добавить событие в ленту
     void addEvent(long userId, EventType type, Operation op, long entityId);
 
-    // Получить ленту пользователя
+    // получить ленту пользователя по userId
     List<Event> getFeed(long userId);
 }
