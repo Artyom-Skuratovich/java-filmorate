@@ -55,9 +55,12 @@ class FeedControllerTest {
         userId = u.getId();
 
         // рус: добавим 2 события через EventService (он сам проставит timestamp)
-        eventService.addEvent(userId, EventType.LIKE,   Operation.ADD,    111L);
+        eventService.addEvent(userId, EventType.LIKE, Operation.ADD, 111L);
         // небольшая пауза, чтобы гарантированно отличались ts
-        try { Thread.sleep(5); } catch (InterruptedException ignored) {}
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException ignored) {
+        }
         eventService.addEvent(userId, EventType.FRIEND, Operation.REMOVE, 222L);
     }
 
