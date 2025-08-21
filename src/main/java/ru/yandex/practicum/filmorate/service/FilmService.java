@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.StorageUtils;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
@@ -29,6 +26,7 @@ public class FilmService {
     private final UserStorage userStorage;
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
+    private final EventService eventService;
 
     public List<FilmDto> findAll() {
         return filmStorage.findAll()
@@ -79,6 +77,9 @@ public class FilmService {
     }
 
     public void delete(int filmId) {
+        // валидация существования, чтобы вернуть 404 если нет
+        StorageUtils.findModel(filmStorage, filmId,
+                String.format("Фильм с id=%d не найден", filmId));
         filmStorage.delete(filmId);
     }
 
@@ -92,6 +93,7 @@ public class FilmService {
                 userId
         ));
         filmStorage.addLike(film.getId(), user.getId());
+        eventService.addEvent(user.getId(), EventType.LIKE, Operation.ADD, film.getId());
         return buildDto(film);
     }
 
@@ -107,6 +109,7 @@ public class FilmService {
                     userId
             ));
         }
+        eventService.addEvent(userId, EventType.LIKE, Operation.REMOVE, filmId);
         return buildDto(film);
     }
 

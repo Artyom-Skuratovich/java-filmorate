@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.CreateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
@@ -47,9 +48,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void delete(@PathVariable int userId) {
         log.info("DELETE-запрос на удаление пользователя, id={}", userId);
-        service.delete(userId);
+        service.delete(userId); // <-- используем поле service
     }
 
     @PutMapping("/{userId}/friends/{friendId}")

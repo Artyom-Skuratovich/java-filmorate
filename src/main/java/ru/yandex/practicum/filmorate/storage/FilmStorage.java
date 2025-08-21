@@ -10,4 +10,6 @@ public interface FilmStorage extends Storage<Film> {
     void addLike(int filmId, int userId);
 
     boolean deleteLike(int filmId, int userId);
+
+    void delete(int filmId);
 }
