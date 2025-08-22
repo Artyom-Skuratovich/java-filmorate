@@ -39,8 +39,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             JOIN likes l1 ON f.id = l1.film_id AND l1.user_id = ?
             JOIN likes l2 ON f.id = l2.film_id AND l2.user_id = ?
             ORDER BY (
-                SELECT COUNT(*) 
-                FROM likes l 
+                SELECT COUNT(*)
+                FROM likes l
                 WHERE l.film_id = f.id
             ) DESC
             """;
