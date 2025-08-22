@@ -106,9 +106,15 @@ public class FilmService {
         return buildDto(film);
     }
 
-    public List<FilmDto> findMostPopularFilms(int count) {
-        return filmStorage.findMostPopularFilms(count)
-                .stream()
+    public List<FilmDto> findMostPopularFilms(Integer count, Integer genreId, Integer year) {
+        int limit = (count == null || count <= 0) ? 10 : count;
+        if (genreId != null) {
+            StorageUtils.findModel(genreStorage, genreId, String.format(
+                    "Жанр с id=%d не найден", genreId
+            ));
+        }
+        List<Film> films = filmStorage.findMostPopularFilms(limit, genreId, year);
+        return films.stream()
                 .map(this::buildDto)
                 .toList();
     }

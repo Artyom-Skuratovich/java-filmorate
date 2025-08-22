@@ -65,11 +65,15 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<FilmDto> findMostPopularFilms(@RequestParam(required = false) Integer count) {
-        if ((count == null) || (count < 0)) {
+    public List<FilmDto> findMostPopularFilms(
+            @RequestParam(required = false) Integer count,
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer year) {
+        if (count == null && genreId == null && year == null) {
             count = 10;
         }
-        log.info("GET-запрос на получение списка наиболее популярных фильмов, count={}", count);
-        return service.findMostPopularFilms(count);
+        log.info("GET-запрос на получение популярных фильмов, count={}, genreId={}, year={}",
+                count, genreId, year);
+        return service.findMostPopularFilms(count, genreId, year);
     }
 }

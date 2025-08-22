@@ -21,7 +21,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findMostPopularFilms(int count) {
+    public List<Film> findMostPopularFilms(int count, Integer genreId, Integer year) {
         throw new UnsupportedOperationException();
     }
 

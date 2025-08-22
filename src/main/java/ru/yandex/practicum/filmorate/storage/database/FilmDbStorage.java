@@ -13,14 +13,6 @@ import java.util.Optional;
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM films";
     private static final String FIND_QUERY = "SELECT * FROM films WHERE id = ?";
-    private static final String FIND_MOST_POPULAR_FILMS_QUERY = """
-            SELECT f.*
-            FROM films AS f
-            JOIN likes AS l ON f.id = l.film_id
-            GROUP BY f.id
-            ORDER BY COUNT(l.film_id) DESC
-            LIMIT ?;
-            """;
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String UPDATE_QUERY = """
             UPDATE films
@@ -70,8 +62,49 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public List<Film> findMostPopularFilms(int count) {
-        return findMany(FIND_MOST_POPULAR_FILMS_QUERY, count);
+    public List<Film> findMostPopularFilms(int count, Integer genreId, Integer year) {
+        if (genreId != null && year != null) {
+            return findMany("""
+            SELECT f.*
+            FROM films f
+            JOIN films_genres fg ON f.id = fg.film_id
+            LEFT JOIN likes l ON f.id = l.film_id
+            WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM f.release_date) = ?
+            GROUP BY f.id
+            ORDER BY COUNT(l.user_id) DESC
+            LIMIT ?
+            """, genreId, year, count);
+        } else if (genreId != null) {
+            return findMany("""
+            SELECT f.*
+            FROM films f
+            JOIN films_genres fg ON f.id = fg.film_id
+            LEFT JOIN likes l ON f.id = l.film_id
+            WHERE fg.genre_id = ?
+            GROUP BY f.id
+            ORDER BY COUNT(l.user_id) DESC
+            LIMIT ?
+            """, genreId, count);
+        } else if (year != null) {
+            return findMany("""
+            SELECT f.*
+            FROM films f
+            LEFT JOIN likes l ON f.id = l.film_id
+            WHERE EXTRACT(YEAR FROM f.release_date) = ?
+            GROUP BY f.id
+            ORDER BY COUNT(l.user_id) DESC
+            LIMIT ?
+            """, year, count);
+        } else {
+            return findMany("""
+            SELECT f.*
+            FROM films f
+            LEFT JOIN likes l ON f.id = l.film_id
+            GROUP BY f.id
+            ORDER BY COUNT(l.user_id) DESC
+            LIMIT ?
+            """, count);
+        }
     }
 
     @Override
