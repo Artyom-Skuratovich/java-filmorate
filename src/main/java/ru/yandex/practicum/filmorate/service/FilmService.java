@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
@@ -148,5 +149,21 @@ public class FilmService {
                 mpa.orElseThrow(() -> new NotFoundException(String.format("MPA с id=%d не найден", film.getMpaId()))),
                 genreStorage.findGenresForFilm(film.getId())
         );
+    }
+
+    public List<FilmDto> findCommonFilms(int userId, int friendId) {
+        StorageUtils.findModel(userStorage, userId, String.format(
+                "Пользователь с id=%d не найден", userId
+        ));
+        StorageUtils.findModel(userStorage, friendId, String.format(
+                "Пользователь с id=%d не найден", friendId
+        ));
+        if (userId == friendId) {
+            throw new NotFoundException("userId и friendId не могут быть одинаковыми");
+        }
+        List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);
+        return commonFilms.stream()
+                .map(this::buildDto)
+                .toList();
     }
 }
