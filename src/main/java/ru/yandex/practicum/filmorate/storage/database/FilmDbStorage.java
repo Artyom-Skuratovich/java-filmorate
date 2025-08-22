@@ -33,6 +33,37 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             """;
     private static final String ADD_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
+    private static final String FIND_FILM_RECOMMENDATIONS_QUERY = """
+            WITH user_likes AS (
+              SELECT film_id
+              FROM likes
+              WHERE user_id = ?
+            ),
+            overlaps AS (
+              SELECT l2.user_id AS other_user, COUNT(*) AS common_cnt
+              FROM likes l1
+              JOIN likes l2 ON l1.film_id = l2.film_id
+              WHERE l1.user_id = ? AND l2.user_id <> ?
+              GROUP BY l2.user_id
+            ),
+            best AS (
+              SELECT other_user
+              FROM overlaps
+              WHERE common_cnt = (SELECT COALESCE(MAX(common_cnt), 0) FROM overlaps)
+            ),
+            candidates AS (
+              SELECT l.film_id
+              FROM likes l
+              JOIN best b ON b.other_user = l.user_id
+            )
+            SELECT f.*, COUNT(*) AS votes
+            FROM films f
+            JOIN candidates c ON c.film_id = f.id
+            LEFT JOIN user_likes ul ON ul.film_id = f.id
+            WHERE ul.film_id IS NULL
+            GROUP BY f.id
+            ORDER BY votes DESC, f.id ASC;
+            """;
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -94,5 +125,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public void delete(int id) {
         delete(DELETE_QUERY, id);
+    }
+
+    public List<Film> findFilmRecommendations(int userId) {
+        return findMany(FIND_FILM_RECOMMENDATIONS_QUERY, userId, userId, userId);
     }
 }

@@ -66,6 +66,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.remove(id);
     }
 
+    @Override
+    public List<Film> findFilmRecommendations(int count) {
+        throw new UnsupportedOperationException();
+    }
+
     private static synchronized int getNextId() {
         return id++;
     }

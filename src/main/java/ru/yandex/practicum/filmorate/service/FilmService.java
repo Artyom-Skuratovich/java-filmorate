@@ -117,6 +117,17 @@ public class FilmService {
                 .toList();
     }
 
+    public List<FilmDto> findFilmRecommendations(int userId) {
+        User user = StorageUtils.findModel(userStorage, userId, String.format(
+                "Не удалось получить рекомендации по фильмам для несуществующего пользователя, id=%d",
+                userId
+        ));
+        return filmStorage.findFilmRecommendations(user.getId())
+                .stream()
+                .map(this::buildDto)
+                .toList();
+    }
+
     private void updateGenresForFilm(int filmId, List<Integer> genres) {
         List<Integer> currentGenres = genreStorage.findGenresForFilm(filmId).stream().map(Genre::getId).toList();
         List<Integer> genresForCreate = new ArrayList<>();
