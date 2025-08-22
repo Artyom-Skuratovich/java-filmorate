@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
@@ -13,11 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.StorageUtils;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.*;
 
@@ -113,6 +108,17 @@ public class FilmService {
 
     public List<FilmDto> findMostPopularFilms(int count) {
         return filmStorage.findMostPopularFilms(count)
+                .stream()
+                .map(this::buildDto)
+                .toList();
+    }
+
+    public List<FilmDto> findFilmRecommendations(int userId) {
+        User user = StorageUtils.findModel(userStorage, userId, String.format(
+                "Не удалось получить рекомендации по фильмам для несуществующего пользователя, id=%d",
+                userId
+        ));
+        return filmStorage.findFilmRecommendations(user.getId())
                 .stream()
                 .map(this::buildDto)
                 .toList();
