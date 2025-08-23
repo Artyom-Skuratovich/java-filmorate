@@ -69,9 +69,6 @@ public class FilmController {
             @RequestParam(required = false) Integer count,
             @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) Integer year) {
-        if (count == null && genreId == null && year == null) {
-            count = 10;
-        }
         log.info("GET-запрос на получение популярных фильмов, count={}, genreId={}, year={}",
                 count, genreId, year);
         return service.findMostPopularFilms(count, genreId, year);

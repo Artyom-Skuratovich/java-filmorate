@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,48 +64,33 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> findMostPopularFilms(int count, Integer genreId, Integer year) {
-        if (genreId != null && year != null) {
-            return findMany("""
-            SELECT f.*
-            FROM films f
-            JOIN films_genres fg ON f.id = fg.film_id
-            LEFT JOIN likes l ON f.id = l.film_id
-            WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM f.release_date) = ?
-            GROUP BY f.id
-            ORDER BY COUNT(l.user_id) DESC
-            LIMIT ?
-            """, genreId, year, count);
-        } else if (genreId != null) {
-            return findMany("""
-            SELECT f.*
-            FROM films f
-            JOIN films_genres fg ON f.id = fg.film_id
-            LEFT JOIN likes l ON f.id = l.film_id
-            WHERE fg.genre_id = ?
-            GROUP BY f.id
-            ORDER BY COUNT(l.user_id) DESC
-            LIMIT ?
-            """, genreId, count);
-        } else if (year != null) {
-            return findMany("""
-            SELECT f.*
-            FROM films f
-            LEFT JOIN likes l ON f.id = l.film_id
-            WHERE EXTRACT(YEAR FROM f.release_date) = ?
-            GROUP BY f.id
-            ORDER BY COUNT(l.user_id) DESC
-            LIMIT ?
-            """, year, count);
-        } else {
-            return findMany("""
-            SELECT f.*
-            FROM films f
-            LEFT JOIN likes l ON f.id = l.film_id
-            GROUP BY f.id
-            ORDER BY COUNT(l.user_id) DESC
-            LIMIT ?
-            """, count);
+        StringBuilder query = new StringBuilder("""
+                SELECT f.*
+                FROM films f
+                """);
+        List<Object> params = new ArrayList<>();
+        if (genreId != null) {
+            query.append("JOIN films_genres fg ON f.id = fg.film_id ");
         }
+        query.append("""
+                LEFT JOIN likes l ON f.id = l.film_id
+                WHERE 1=1
+                """);
+        if (genreId != null) {
+            query.append("AND fg.genre_id = ? ");
+            params.add(genreId);
+        }
+        if (year != null) {
+            query.append("AND EXTRACT(YEAR FROM f.release_date) = ? ");
+            params.add(year);
+        }
+        query.append("""
+                GROUP BY f.id
+                ORDER BY COUNT(l.user_id) DESC
+                LIMIT ?
+                """);
+        params.add(count);
+        return findMany(query.toString(), params.toArray());
     }
 
     @Override
