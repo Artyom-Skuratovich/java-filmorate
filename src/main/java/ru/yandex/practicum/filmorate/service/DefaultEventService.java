@@ -1,39 +1,57 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.dto.EventDto;
+import ru.yandex.practicum.filmorate.dto.mapper.EventMapper;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
-// Сервис ленты событий (запись и выдача)
 @Service
 @RequiredArgsConstructor
 public class DefaultEventService implements EventService {
 
-    private final EventStorage eventStorage; // <-- niente UserService
+    private final EventStorage eventStorage;
+
+    // явно указываем реализацию хранилища пользователей (DB)
+    private final @Qualifier("userDbStorage") UserStorage userStorage;
 
     @Override
-    @Transactional
     public void addEvent(long userId, EventType type, Operation op, long entityId) {
-        Event e = Event.builder()
-                .timestamp(System.currentTimeMillis())
-                .userId(userId)
-                .eventType(type)
-                .operation(op)
-                .entityId(entityId)
-                .build();
-        eventStorage.save(e);
+        // валидация пользователя
+        userStorage.find((int) userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Пользователь с id=%d не найден", userId)));
+
+        // создаём и сохраняем событие
+        Event event = new Event();
+        event.setTimestamp(System.currentTimeMillis());
+        event.setUserId(userId);
+        event.setEventType(type);
+        event.setOperation(op);
+        event.setEntityId(entityId);
+
+        eventStorage.save(event);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Event> getFeed(long userId) {
-        // Никакой валидации здесь — только доступ к БД
-        return eventStorage.findByUserIdOrderByTimestampAsc(userId);
+    public List<EventDto> getFeed(long userId) {
+        // валидация пользователя
+        userStorage.find((int) userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Пользователь с id=%d не найден", userId)));
+
+        // получаем события и мапим в DTO
+        return eventStorage.findByUserIdOrderByTimestampAsc(userId)
+                .stream()
+                .map(EventMapper::toDto)
+                .toList();
     }
 }

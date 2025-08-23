@@ -53,10 +53,26 @@ public abstract class BaseDbStorage<T> implements Storage<T> {
         }, keyHolder);
 
         Integer id = keyHolder.getKeyAs(Integer.class);
-
         if (id == null) {
             throw new InternalServerException("Не удалось сохранить данные");
         }
         return id;
+    }
+
+    protected long createLong(String query, Object... params) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            for (int idx = 0; idx < params.length; idx++) {
+                ps.setObject(idx + 1, params[idx]);
+            }
+            return ps;
+        }, keyHolder);
+
+        Number key = keyHolder.getKey();
+        if (key == null) {
+            throw new InternalServerException("Не удалось сохранить данные");
+        }
+        return key.longValue();
     }
 }

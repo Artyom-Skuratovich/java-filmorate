@@ -1,49 +1,72 @@
 package ru.yandex.practicum.filmorate.storage.database;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.database.mapper.EventRowMapper;
 
-import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Optional;
 
-// Хранилище событий на базе JdbcTemplate
+// Хранилище событий на базе BaseDbStorage
 @Repository
-@RequiredArgsConstructor
-public class EventDbStorage implements EventStorage {
+public class EventDbStorage extends BaseDbStorage<Event> implements EventStorage {
 
-    private final JdbcTemplate jdbc;
-    private final EventRowMapper mapper = new EventRowMapper();
+    private static final String INSERT_SQL =
+            "INSERT INTO events (ts, user_id, event_type, operation, entity_id) VALUES (?,?,?,?,?)";
+
+    private static final String FIND_BY_USER_SQL =
+            "SELECT event_id, ts, user_id, event_type, operation, entity_id " +
+                    "FROM events WHERE user_id = ? ORDER BY ts ASC, event_id ASC";
+
+    public EventDbStorage(JdbcTemplate jdbc) {
+        super(jdbc, new EventRowMapper());
+    }
 
     @Override
     public Event save(Event event) {
-        // Вставляем запись и возвращаем присвоенный PK
-        final String sql = "INSERT INTO events (ts, user_id, event_type, operation, entity_id) VALUES (?,?,?,?,?)";
-        KeyHolder kh = new GeneratedKeyHolder();
-        jdbc.update(con -> {
-            PreparedStatement ps = con.prepareStatement(sql, new String[]{"event_id"});
-            ps.setLong(1, event.getTimestamp());
-            ps.setLong(2, event.getUserId());
-            ps.setString(3, event.getEventType().name());
-            ps.setString(4, event.getOperation().name());
-            ps.setLong(5, event.getEntityId());
-            return ps;
-        }, kh);
-        if (kh.getKey() != null) {
-            event.setEventId(kh.getKey().longValue());
-        }
+        // PK у events — BIGINT, используем createLong(...)
+        long id = createLong(
+                INSERT_SQL,
+                event.getTimestamp(),
+                event.getUserId(),
+                event.getEventType().name(),
+                event.getOperation().name(),
+                event.getEntityId()
+        );
+        event.setEventId(id);
         return event;
     }
 
     @Override
     public List<Event> findByUserIdOrderByTimestampAsc(long userId) {
-        final String sql = "SELECT event_id, ts, user_id, event_type, operation, entity_id " +
-                "FROM events WHERE user_id = ? ORDER BY ts ASC, event_id ASC";
-        return jdbc.query(sql, mapper, userId);
+        return findMany(FIND_BY_USER_SQL, userId);
+    }
+
+    // ===== Методы из Storage<T>, которые не нужны для Event =====
+    @Override
+    public Event create(Event model) {
+        throw new UnsupportedOperationException("create(Event) not supported, use save()");
+    }
+
+    @Override
+    public Optional<Event> find(int id) {
+        throw new UnsupportedOperationException("find by id not supported for Event");
+    }
+
+    @Override
+    public List<Event> findAll() {
+        throw new UnsupportedOperationException("findAll not supported for Event");
+    }
+
+    @Override
+    public Event update(Event model) {
+        throw new UnsupportedOperationException("update not supported for Event");
+    }
+
+    @Override
+    public void delete(int id) {
+        throw new UnsupportedOperationException("delete not supported for Event");
     }
 }
