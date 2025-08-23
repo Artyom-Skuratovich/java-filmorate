@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -67,7 +68,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<FilmDto> findMostPopularFilms(
-            @RequestParam(defaultValue = "10") @Positive int count,
+            @RequestParam(defaultValue = "10") Integer count,
             @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) Integer year) {
         log.info("GET-запрос на получение популярных фильмов, count={}, genreId={}, year={}",
