@@ -27,4 +27,10 @@ public class GlobalExceptionHandler {
         log.error("Возникла непредвиденная ошибка: ", throwable);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Внутренняя ошибка сервера"));
     }
+
+    @ExceptionHandler(SameUserIdsException.class)
+    public ResponseEntity<ErrorResponse> handleSameUserIdsException(SameUserIdsException exception) {
+        log.warn("Ошибка валидации: {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exception.getMessage()));
+    }
 }
