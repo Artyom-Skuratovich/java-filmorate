@@ -96,4 +96,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         // удаляем фильм; каскады почистят likes и films_genres
         delete(DELETE_QUERY, id);   // <-- helper из BaseDbStorage
     }
+
+    @Override
+    public List<Film> findFilmRecommendations(int userId) {
+        // временная заглушка для рекомендаций фильмов, пока логика не реализована
+        return List.of();
+    }
+
 }

@@ -12,4 +12,6 @@ public interface FilmStorage extends Storage<Film> {
     boolean deleteLike(int filmId, int userId);
 
     void delete(int filmId);
+
+    List<Film> findFilmRecommendations(int userId);
 }
