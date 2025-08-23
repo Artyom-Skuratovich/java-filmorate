@@ -13,24 +13,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException exception) {
         log.warn("Возникло исключение: ", exception);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(exception.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(
+                "Не удалось найти объект", exception.getMessage())
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         log.warn("Возникло исключение валидации: ", exception);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exception.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(
+                "Ошибка валидации", exception.getMessage())
+        );
     }
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorResponse> handleThrowable(Throwable throwable) {
         log.error("Возникла непредвиденная ошибка: ", throwable);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Внутренняя ошибка сервера"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(
+                "Непредвиденная ошибка сервера", throwable.getMessage())
+        );
     }
 
     @ExceptionHandler(SameUserIdsException.class)
     public ResponseEntity<ErrorResponse> handleSameUserIdsException(SameUserIdsException exception) {
-        log.warn("Ошибка валидации: {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(exception.getMessage()));
+        log.warn("Исключение при попытке передать одинаковые id: ", exception);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(
+                "Попытка передачи одинаковых id", exception.getMessage())
+        );
     }
 }

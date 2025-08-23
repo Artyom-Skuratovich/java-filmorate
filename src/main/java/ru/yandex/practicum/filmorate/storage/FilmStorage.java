@@ -14,4 +14,6 @@ public interface FilmStorage extends Storage<Film> {
     List<Film> findCommonFilms(int userId, int friendId);
 
     List<Film> findFilmRecommendations(int userId);
+
+    List<Film> findDirectorFilmsSorted(int directorId, FilmSortOption sortOption);
 }

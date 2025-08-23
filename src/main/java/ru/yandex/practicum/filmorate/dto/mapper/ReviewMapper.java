@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.dto.mapper;
 
-import ru.yandex.practicum.filmorate.dto.CreateReviewRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
-import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
+import ru.yandex.practicum.filmorate.dto.update.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.model.Review;
 
 public final class ReviewMapper {

@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.update.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 
 import java.util.List;
 
@@ -81,5 +80,17 @@ public class FilmController {
         log.info("GET-запрос на получение общих фильмов пользователей, userId={}, friendId={}",
                 userId, friendId);
         return service.findCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> findDirectorFilmsSorted(
+            @PathVariable int directorId,
+            @RequestParam(name = "sortBy") FilmSortOption sortOption) {
+        log.info(
+                "GET-запрос на получение фильмов реж. сорт. по кол-ву лайков или г. вып/, directorId={}, sortOption={}",
+                directorId,
+                sortOption
+        );
+        return service.findDirectorFilmsSorted(directorId, sortOption);
     }
 }

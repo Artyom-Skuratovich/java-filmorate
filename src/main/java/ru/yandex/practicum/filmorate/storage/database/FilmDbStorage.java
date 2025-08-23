@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 SELECT f.*
                 FROM films f
                 """);
-        List<Object> params = new ArrayList<>();
+        List<Object> params = new ArrayList<>(3);
         if (genreId != null) {
             query.append("JOIN films_genres fg ON f.id = fg.film_id ");
         }
@@ -159,6 +160,33 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
     public List<Film> findFilmRecommendations(int userId) {
         return findMany(FIND_FILM_RECOMMENDATIONS_QUERY, userId, userId, userId);
+    }
+
+    @Override
+    public List<Film> findDirectorFilmsSorted(int directorId, FilmSortOption sortOption) {
+        StringBuilder query = new StringBuilder("""
+                SELECT f.*
+                FROM films f
+                JOIN films_directors fd ON f.id = fd.film_id
+                """);
+
+        String orderBy = "EXTRACT(YEAR FROM f.release_date)";
+
+        if (sortOption == FilmSortOption.LIKES) {
+            query.append("""
+                    JOIN likes l ON fd.film_id = l.film_id
+                    """);
+            orderBy = "COUNT(l.film_id) DESC";
+        }
+
+        query.append(String.format("""
+                WHERE fd.director_id = ?
+                GROUP BY f.id
+                ORDER BY %s
+                """, orderBy)
+        );
+
+        return findMany(query.toString(), directorId);
     }
 
     @Override
