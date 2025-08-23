@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmSearchOption;
 import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -187,6 +188,38 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         );
 
         return findMany(query.toString(), directorId);
+    }
+
+    @Override
+    public List<Film> search(String pattern, FilmSearchOption searchOption) {
+        StringBuilder query = new StringBuilder("""
+                SELECT f.*
+                FROM films f
+                """);
+        List<String> params = new ArrayList<>(2);
+        pattern = "%" + pattern + "%";
+
+        StringBuilder where = new StringBuilder("WHERE 1=1 AND (");
+        String condition = "";
+
+        if ((searchOption == FilmSearchOption.DIRECTOR) || (searchOption == FilmSearchOption.BOTH)) {
+            query.append("""
+                    LEFT JOIN films_directors fd ON f.id = fd.film_id
+                    LEFT JOIN directors d ON fd.director_id = d.id
+                    """);
+            where.append("(d.name IS NOT NULL AND LOWER(d.name) LIKE LOWER(?)) ");
+            condition = "OR";
+            params.add(pattern);
+        }
+
+        if ((searchOption == FilmSearchOption.TITLE) || (searchOption == FilmSearchOption.BOTH)) {
+            where.append(String.format("%s LOWER(f.name) LIKE LOWER(?)", condition));
+            params.add(pattern);
+        }
+
+        query.append(where.append(')'));
+
+        return findMany(query.toString(), params.toArray());
     }
 
     @Override

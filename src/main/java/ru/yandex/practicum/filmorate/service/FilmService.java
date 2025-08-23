@@ -177,6 +177,13 @@ public class FilmService {
                 .toList();
     }
 
+    public List<FilmDto> search(String pattern, FilmSearchOption searchOption) {
+        return filmStorage.search(pattern, searchOption)
+                .stream()
+                .map(this::buildDto)
+                .toList();
+    }
+
     private void updateGenresForFilm(int filmId, Set<Genre> genres) {
         List<Integer> current = genreStorage.findGenresForFilm(filmId).stream().map(Genre::getId).toList();
         List<Integer> forCreate = new ArrayList<>();
