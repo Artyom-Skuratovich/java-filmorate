@@ -36,6 +36,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> findCommonFilms(int userId, int friendId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Film create(Film model) {
         model.setId(getNextId());
         films.put(model.getId(), model);

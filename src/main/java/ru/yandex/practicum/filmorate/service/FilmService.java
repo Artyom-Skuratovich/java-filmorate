@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.SameUserIdsException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -161,5 +162,21 @@ public class FilmService {
                 mpa.orElseThrow(() -> new NotFoundException(String.format("MPA с id=%d не найден", film.getMpaId()))),
                 genreStorage.findGenresForFilm(film.getId())
         );
+    }
+
+    public List<FilmDto> findCommonFilms(int userId, int friendId) {
+        StorageUtils.findModel(userStorage, userId, String.format(
+                "Пользователь с id=%d не найден", userId
+        ));
+        StorageUtils.findModel(userStorage, friendId, String.format(
+                "Пользователь с id=%d не найден", friendId
+        ));
+        if (userId == friendId) {
+            throw new SameUserIdsException("userId и friendId не могут быть одинаковыми");
+        }
+        List<Film> commonFilms = filmStorage.findCommonFilms(userId, friendId);
+        return commonFilms.stream()
+                .map(this::buildDto)
+                .toList();
     }
 }
