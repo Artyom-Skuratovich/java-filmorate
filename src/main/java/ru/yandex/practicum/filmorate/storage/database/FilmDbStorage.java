@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,14 +14,6 @@ import java.util.Optional;
 public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String FIND_ALL_QUERY = "SELECT * FROM films";
     private static final String FIND_QUERY = "SELECT * FROM films WHERE id = ?";
-    private static final String FIND_MOST_POPULAR_FILMS_QUERY = """
-            SELECT f.*
-            FROM films AS f
-            JOIN likes AS l ON f.id = l.film_id
-            GROUP BY f.id
-            ORDER BY COUNT(l.film_id) DESC
-            LIMIT ?;
-            """;
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String UPDATE_QUERY = """
             UPDATE films
@@ -70,8 +63,34 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public List<Film> findMostPopularFilms(int count) {
-        return findMany(FIND_MOST_POPULAR_FILMS_QUERY, count);
+    public List<Film> findMostPopularFilms(int count, Integer genreId, Integer year) {
+        StringBuilder query = new StringBuilder("""
+                SELECT f.*
+                FROM films f
+                """);
+        List<Object> params = new ArrayList<>();
+        if (genreId != null) {
+            query.append("JOIN films_genres fg ON f.id = fg.film_id ");
+        }
+        query.append("""
+                LEFT JOIN likes l ON f.id = l.film_id
+                WHERE 1=1
+                """);
+        if (genreId != null) {
+            query.append("AND fg.genre_id = ? ");
+            params.add(genreId);
+        }
+        if (year != null) {
+            query.append("AND EXTRACT(YEAR FROM f.release_date) = ? ");
+            params.add(year);
+        }
+        query.append("""
+                GROUP BY f.id
+                ORDER BY COUNT(l.user_id) DESC
+                LIMIT ?
+                """);
+        params.add(count);
+        return findMany(query.toString(), params.toArray());
     }
 
     @Override

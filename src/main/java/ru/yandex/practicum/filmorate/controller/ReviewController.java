@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.CreateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.service.ReviewService;
+
 import java.util.List;
 
 @Slf4j
@@ -71,14 +72,14 @@ public class ReviewController {
     }
 
     @GetMapping(params = "!filmId")
-    public List<ReviewDto> getAll(@RequestParam(defaultValue="10") @Positive Integer count) {
+    public List<ReviewDto> getAll(@RequestParam(defaultValue = "10") @Positive Integer count) {
         log.info("GET-запрос на получение списка всех отзывов count={}", count);
         return service.getAllFilmsReviews(count);
     }
 
     @GetMapping(params = "filmId")
     public List<ReviewDto> getByFilm(@RequestParam Integer filmId,
-                                     @RequestParam(defaultValue="10") @Positive Integer count) {
+                                     @RequestParam(defaultValue = "10") @Positive Integer count) {
 
         log.info("GET-запрос на получение списка отзывов к фильму filmId={}, count={}", filmId, count);
         return service.getSingleFilmReviews(filmId, count);

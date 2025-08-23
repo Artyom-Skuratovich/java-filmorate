@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 
 public interface FilmStorage extends Storage<Film> {
-    List<Film> findMostPopularFilms(int count);
+    List<Film> findMostPopularFilms(int count, Integer genreId, Integer year);
 
     void addLike(int filmId, int userId);
 

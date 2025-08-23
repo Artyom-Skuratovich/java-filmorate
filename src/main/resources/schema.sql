@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS likes (
 	PRIMARY KEY (user_id, film_id)
 );
 
-CREATE INDEX ix_likes_film_user ON likes(film_id, user_id);
+CREATE INDEX IF NOT EXISTS ix_likes_film_user ON likes(film_id, user_id);
 
 CREATE TABLE IF NOT EXISTS friends (
 	user_id INTEGER NOT NULL,
