@@ -34,6 +34,19 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String ADD_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
 
+    // из develop: запрос для рекомендаций (классическая формула «похожие пользователи»)
+    private static final String FIND_FILM_RECOMMENDATIONS_QUERY = """
+            SELECT f.*
+            FROM likes l
+            JOIN likes l2 ON l.user_id = l2.user_id
+            JOIN films f ON f.id = l2.film_id
+            WHERE l.user_id <> ?                                   -- другие пользователи
+              AND l.film_id IN (SELECT film_id FROM likes WHERE user_id = ?)  -- пересечение интересов
+              AND l2.film_id NOT IN (SELECT film_id FROM likes WHERE user_id = ?) -- ещё не лайкал текущий
+            GROUP BY f.id
+            ORDER BY COUNT(*) DESC
+            """;
+
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
     }
@@ -94,13 +107,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public void delete(int id) {
         // удаляем фильм; каскады почистят likes и films_genres
-        delete(DELETE_QUERY, id);   // <-- helper из BaseDbStorage
+        delete(DELETE_QUERY, id);   // helper из BaseDbStorage
     }
 
     @Override
     public List<Film> findFilmRecommendations(int userId) {
-        // временная заглушка для рекомендаций фильмов, пока логика не реализована
-        return List.of();
+        // из develop: возвращаем рекомендации по SQL-запросу
+        return findMany(FIND_FILM_RECOMMENDATIONS_QUERY, userId, userId, userId);
     }
-
 }

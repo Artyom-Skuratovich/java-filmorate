@@ -11,7 +11,9 @@ public interface FilmStorage extends Storage<Film> {
 
     boolean deleteLike(int filmId, int userId);
 
+    // из add-feed: удаление фильма по id
     void delete(int filmId);
 
+    // из develop: рекомендации фильмов
     List<Film> findFilmRecommendations(int userId);
 }
