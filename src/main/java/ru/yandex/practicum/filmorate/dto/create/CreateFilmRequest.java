@@ -1,21 +1,20 @@
-package ru.yandex.practicum.filmorate.dto;
+package ru.yandex.practicum.filmorate.dto.create;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.util.annotation.ReleaseDate;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data
-public class UpdateFilmRequest {
-    @NotNull
-    private Integer id;
-
+public class CreateFilmRequest {
     @NotNull
     @NotBlank(message = "Название не может быть пустым")
     private String name;
@@ -33,7 +32,9 @@ public class UpdateFilmRequest {
     private Integer duration;
 
     @NotNull
-    private Integer rate;
+    private Mpa mpa;
 
     private Set<Genre> genres;
+
+    private Set<Director> directors;
 }

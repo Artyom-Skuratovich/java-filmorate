@@ -5,9 +5,9 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.CreateReviewRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
-import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
+import ru.yandex.practicum.filmorate.dto.update.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import java.util.List;
@@ -80,9 +80,7 @@ public class ReviewController {
     @GetMapping(params = "filmId")
     public List<ReviewDto> getByFilm(@RequestParam Integer filmId,
                                      @RequestParam(defaultValue = "10") @Positive Integer count) {
-
         log.info("GET-запрос на получение списка отзывов к фильму filmId={}, count={}", filmId, count);
         return service.getSingleFilmReviews(filmId, count);
     }
-
 }
