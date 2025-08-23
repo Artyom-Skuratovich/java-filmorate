@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -44,11 +43,11 @@ public class ReviewService {
     }
 
     public ReviewDto create(CreateReviewRequest request) {
-        Film film = StorageUtils.findModel(filmStorage, request.getFilmId(), String.format(
+        StorageUtils.findModel(filmStorage, request.getFilmId(), String.format(
                 "Отзыв для фильма id=%d не создан. Такого фильма нет.",
                 request.getFilmId()
         ));
-        User user = StorageUtils.findModel(userStorage, request.getUserId(), String.format(
+        StorageUtils.findModel(userStorage, request.getUserId(), String.format(
                 "Не удалось обновить отзыв, так как пользователя с id=%d не существует",
                 request.getUserId()
         ));
@@ -102,7 +101,7 @@ public class ReviewService {
                 "Не удалось удалить лайк отзыву с id=%d, так как такого отзыва не существует",
                 reviewId
         ));
-        User user = StorageUtils.findModel(userStorage, userId, String.format(
+        StorageUtils.findModel(userStorage, userId, String.format(
                 "Не удалось удалить лайк отзыву, так как пользователя с id=%d не существует",
                 userId
         ));
@@ -141,7 +140,7 @@ public class ReviewService {
                 "Не удалось удалить дизлайк отзыву с id=%d, так как такого отзыва не существует",
                 reviewId
         ));
-        User user = StorageUtils.findModel(userStorage, userId, String.format(
+        StorageUtils.findModel(userStorage, userId, String.format(
                 "Не удалось удалить дизлайк отзыву, так как пользователя с id=%d не существует",
                 userId
         ));

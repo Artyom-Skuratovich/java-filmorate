@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -66,7 +67,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<FilmDto> findMostPopularFilms(
-            @RequestParam(required = false) Integer count,
+            @RequestParam(defaultValue = "10") @Positive int count,
             @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) Integer year) {
         log.info("GET-запрос на получение популярных фильмов, count={}, genreId={}, year={}",
