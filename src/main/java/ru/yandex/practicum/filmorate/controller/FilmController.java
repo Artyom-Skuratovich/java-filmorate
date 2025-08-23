@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.dto.create.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.update.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmSearchOption;
 import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 
 import java.util.List;
@@ -92,5 +93,13 @@ public class FilmController {
                 sortOption
         );
         return service.findDirectorFilmsSorted(directorId, sortOption);
+    }
+
+    @GetMapping("/search")
+    public List<FilmDto> search(
+            @RequestParam(name = "query") String pattern,
+            @RequestParam(name = "by") FilmSearchOption searchOption) {
+        log.info("GET-запрос на поиск по названию фильмов и по режиссёру, pattern={}, by={}", pattern, searchOption);
+        return service.search(pattern, searchOption);
     }
 }

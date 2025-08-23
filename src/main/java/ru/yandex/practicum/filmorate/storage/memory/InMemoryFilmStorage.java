@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.memory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmSearchOption;
 import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -79,6 +80,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findDirectorFilmsSorted(int directorId, FilmSortOption sortOption) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Film> search(String pattern, FilmSearchOption searchOption) {
         throw new UnsupportedOperationException();
     }
 
