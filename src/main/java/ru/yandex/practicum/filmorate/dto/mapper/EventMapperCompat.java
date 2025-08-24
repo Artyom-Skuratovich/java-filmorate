@@ -7,7 +7,8 @@ import java.util.List;
 
 public final class EventMapperCompat {
 
-    private EventMapperCompat() {}
+    private EventMapperCompat() {
+    }
 
     public static List<EventDto> toDtoList(List<Event> events) {
         return events.stream().map(EventMapperCompat::toDto).toList();
