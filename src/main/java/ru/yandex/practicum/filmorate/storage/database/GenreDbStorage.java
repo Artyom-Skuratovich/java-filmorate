@@ -21,7 +21,7 @@ public class GenreDbStorage extends BaseDbStorage<Genre> implements GenreStorage
             """;
     private static final String DELETE_QUERY = "DELETE FROM genres WHERE id = ?";
     private static final String UPDATE_QUERY = "UPDATE genres SET name = ? WHERE id = ?";
-    private static final String CREATE_QUERY = "INSERT INTO genres (name) VALUES (?) RETURNING id";
+    private static final String CREATE_QUERY = "INSERT INTO genres (name) VALUES (?)";
     private static final String ADD_GENRE_TO_FILM_QUERY = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
     private static final String DELETE_GENRE_FROM_FILM_QUERY = "DELETE FROM films_genres WHERE film_id=? AND genre_id=?";
 

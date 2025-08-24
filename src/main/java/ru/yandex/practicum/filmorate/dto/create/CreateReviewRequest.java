@@ -1,19 +1,17 @@
-package ru.yandex.practicum.filmorate.dto;
+package ru.yandex.practicum.filmorate.dto.create;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class UpdateReviewRequest {
-    @NotNull
-    private Integer reviewId;
-
-    @NotNull(message = "Отзыв не может быть пустым")
+public class CreateReviewRequest {
+    @NotBlank(message = "Отзыв не может быть пустым")
     @Size(max = 500, message = "Длина отзыва не более 500 символов")
     private String content;
 
-    @NotNull(message = "Отзыв должен быть либо положительным, либо отрицательным")
+    @NotNull(message = "Нужно указать, положительный ли отзыв")
     private Boolean isPositive;
 
     @NotNull(message = "Должен быть id пользователя создавшего отзыв")

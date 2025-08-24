@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.storage.memory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmSearchOption;
+import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.HashMap;
@@ -21,7 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findMostPopularFilms(int count) {
+    public List<Film> findMostPopularFilms(int count, Integer genreId, Integer year) {
         throw new UnsupportedOperationException();
     }
 
@@ -32,6 +34,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public boolean deleteLike(int filmId, int userId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Film> findCommonFilms(int userId, int friendId) {
         throw new UnsupportedOperationException();
     }
 
@@ -71,6 +78,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void delete(int id) {
         films.remove(id);
+    }
+
+    @Override
+    public List<Film> findFilmRecommendations(int count) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Film> findDirectorFilmsSorted(int directorId, FilmSortOption sortOption) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Film> search(String pattern, FilmSearchOption searchOption) {
+        throw new UnsupportedOperationException();
     }
 
     private static synchronized int getNextId() {

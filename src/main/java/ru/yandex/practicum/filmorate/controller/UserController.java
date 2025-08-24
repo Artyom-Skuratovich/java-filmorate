@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.CreateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateUserRequest;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.dto.update.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService service;
+    private final FilmService filmService;
 
     @PostMapping
     public User create(@Valid @RequestBody CreateUserRequest request) {
@@ -76,5 +79,11 @@ public class UserController {
     public List<User> findCommonFriends(@PathVariable int userId, @PathVariable int otherId) {
         log.info("GET-запрос на получение списка общих друзей, userId={}, otherId={}", userId, otherId);
         return service.findCommonFriends(userId, otherId);
+    }
+
+    @GetMapping("/{userId}/recommendations")
+    public List<FilmDto> findFilmRecommendations(@PathVariable int userId) {
+        log.info("GET-запрос на получение списка рекомендаций по фильмам для пользователя userId={}", userId);
+        return filmService.findFilmRecommendations(userId);
     }
 }

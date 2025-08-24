@@ -3,17 +3,20 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.CreateReviewRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.ReviewDto;
-import ru.yandex.practicum.filmorate.dto.UpdateReviewRequest;
+import ru.yandex.practicum.filmorate.dto.update.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
 import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.*;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.StorageUtils;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -59,6 +62,15 @@ public class ReviewService {
                 userStorage, request.getUserId(),
                 String.format("Не удалось обновить отзыв, так как пользователя с id=%d не существует", request.getUserId())
         );
+
+        StorageUtils.findModel(filmStorage, request.getFilmId(), String.format(
+                "Отзыв для фильма id=%d не создан. Такого фильма нет.",
+                request.getFilmId()
+        ));
+        StorageUtils.findModel(userStorage, request.getUserId(), String.format(
+                "Не удалось обновить отзыв, так как пользователя с id=%d не существует",
+                request.getUserId()
+        ));
 
         Review review = reviewStorage.create(ReviewMapper.mapToReview(request));
 
@@ -131,6 +143,15 @@ public class ReviewService {
                 userStorage, userId,
                 String.format("Не удалось удалить лайк отзыву, так как пользователя с id=%d не существует", userId)
         );
+        Review review = StorageUtils.findModel(reviewStorage, reviewId, String.format(
+                "Не удалось удалить лайк отзыву с id=%d, так как такого отзыва не существует",
+                reviewId
+        ));
+        StorageUtils.findModel(userStorage, userId, String.format(
+                "Не удалось удалить лайк отзыву, так как пользователя с id=%d не существует",
+                userId
+        ));
+
         if (!reviewStorage.deleteLike(reviewId, userId)) {
             throw new NotFoundException(String.format(
                     "Не удалось удалить лайк отзыву с id=%d, так как пользователь с id=%d не ставил лайк",
@@ -169,6 +190,14 @@ public class ReviewService {
                 userStorage, userId,
                 String.format("Не удалось удалить дизлайк отзыву, так как пользователя с id=%d не существует", userId)
         );
+        Review review = StorageUtils.findModel(reviewStorage, reviewId, String.format(
+                "Не удалось удалить дизлайк отзыву с id=%d, так как такого отзыва не существует",
+                reviewId
+        ));
+        StorageUtils.findModel(userStorage, userId, String.format(
+                "Не удалось удалить дизлайк отзыву, так как пользователя с id=%d не существует",
+                userId
+        ));
         if (!reviewStorage.deleteDislike(reviewId, userId)) {
             throw new NotFoundException(String.format(
                     "Не удалось удалить дизлайк отзыву с id=%d, так как пользователь с id=%d не ставил лайк",
