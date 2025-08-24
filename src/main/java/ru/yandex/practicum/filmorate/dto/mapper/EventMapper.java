@@ -19,6 +19,7 @@ public class EventMapper {
                 e.getEntityId()
         );
     }
+
     public List<EventDto> toDtoList(List<Event> events) {
         return events.stream().map(EventMapper::toDto).collect(Collectors.toList());
     }
