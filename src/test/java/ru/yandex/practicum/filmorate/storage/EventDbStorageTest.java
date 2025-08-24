@@ -5,8 +5,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.EventType;
-import ru.yandex.practicum.filmorate.model.Operation;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.database.EventDbStorage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +30,12 @@ class EventDbStorageTest {
 
     @Test
     void saveAndFindByUserId_shouldReturnOrderedAscending() {
-        // rus: создаём пользователя, чтобы пройти FK users(id)
+        // создаём пользователя, чтобы пройти FK users(id)
         jdbc.update("INSERT INTO users (email, login, name, birthday) VALUES (?,?,?,?)",
                 "feed@test.com", "u100", "Feed User", "1990-01-01");
         Long userId = jdbc.queryForObject("SELECT id FROM users WHERE login = ?", Long.class, "u100");
 
-        // rus: готовим 2 события для одного пользователя с возрастающими метками времени
+        // готовим 2 события для одного пользователя с возрастающими метками времени
         Event e1 = Event.builder()
                 .timestamp(1_000L)     // старее
                 .userId(userId)
@@ -52,17 +52,17 @@ class EventDbStorageTest {
                 .entityId(20L)
                 .build();
 
-        storage.save(e2);  // rus: сохраняем в обратном порядке
+        storage.save(e2);  // сохраняем в обратном порядке
         storage.save(e1);
 
-        // rus: выборка должна быть по возрастанию ts (и event_id как tie-breaker)
+        // выборка должна быть по возрастанию ts (и event_id как tie-breaker)
         List<Event> feed = storage.findByUserIdOrderByTimestampAsc(userId);
 
         assertThat(feed).hasSize(2);
         assertThat(feed.get(0).getTimestamp()).isEqualTo(1_000L);
         assertThat(feed.get(1).getTimestamp()).isEqualTo(2_000L);
 
-        // rus: проверим, что id присвоены
+        // проверим, что id присвоены
         assertThat(feed.get(0).getEventId()).isNotNull();
         assertThat(feed.get(1).getEventId()).isNotNull();
     }

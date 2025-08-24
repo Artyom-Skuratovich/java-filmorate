@@ -21,9 +21,10 @@ public class FeedController {
 
     @GetMapping("/users/{id}/feed")
     public List<EventDto> getFeed(@PathVariable("id") long userId) {
-        log.info("GET-запрос ленты событий, userId={}", userId);
-        userService.find((int) userId); // валидируем существование пользователя (404 если нет)
-        // контроллер просто делегирует в сервис и ничего не мапит
+        // валидируем существование пользователя (404 если нет)
+        userService.find((int) userId);
+        // контроллер не преобразует данные — просто делегирует в сервис, который возвращает DTO
+        log.info("GET /users/{}/feed", userId);
         return eventService.getFeed(userId);
     }
 }

@@ -1,17 +1,32 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 
-// Модель события в ленте
-@Data                   // генерирует get/set/toString/hashCode/equals
-@NoArgsConstructor      // пустой конструктор
-@AllArgsConstructor     // конструктор со всеми полями
-@Builder                // билдер
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Event {
-    private long eventId;        // PK
-    private long timestamp;      // epoch millis (колонка ts)
-    private long userId;         // кто совершил действие
-    private EventType eventType; // тип события: LIKE/REVIEW/FRIEND
-    private Operation operation; // операция: ADD/REMOVE/UPDATE
-    private long entityId;       // id связанной сущности
+    // идентификатор события (PK)
+    private long eventId;
+
+    // метка времени в миллисекундах (System.currentTimeMillis())
+    private long timestamp;
+
+    // пользователь, для которого зафиксировано событие
+    private long userId;
+
+    // тип события: LIKE | REVIEW | FRIEND
+    private EventType eventType;
+
+    // операция: ADD | REMOVE | UPDATE
+    private Operation operation;
+
+    // идентификатор сущности (filmId, reviewId, friendId)
+    private long entityId;
 }

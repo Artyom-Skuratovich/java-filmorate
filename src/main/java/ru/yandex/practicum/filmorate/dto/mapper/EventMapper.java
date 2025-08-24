@@ -1,23 +1,25 @@
 package ru.yandex.practicum.filmorate.dto.mapper;
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.EventDto;
 import ru.yandex.practicum.filmorate.model.Event;
 
-// Отдельный класс для преобразования моделей
-public final class EventMapper {
+import java.util.List;
+import java.util.stream.Collectors;
 
-    private EventMapper() {
+@UtilityClass
+public class EventMapper {
+    public EventDto toDto(Event e) {
+        return new EventDto(
+                e.getEventId(),
+                e.getTimestamp(),
+                e.getUserId(),
+                e.getEventType(),
+                e.getOperation(),
+                e.getEntityId()
+        );
     }
-
-    // модель -> DTO
-    public static EventDto toDto(Event e) {
-        return EventDto.builder()
-                .eventId(e.getEventId())
-                .timestamp(e.getTimestamp())
-                .userId(e.getUserId())
-                .eventType(e.getEventType())
-                .operation(e.getOperation())
-                .entityId(e.getEntityId())
-                .build();
+    public List<EventDto> toDtoList(List<Event> events) {
+        return events.stream().map(EventMapper::toDto).collect(Collectors.toList());
     }
 }
