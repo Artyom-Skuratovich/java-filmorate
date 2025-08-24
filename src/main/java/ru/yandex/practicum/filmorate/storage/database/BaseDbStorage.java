@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.database;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,10 +13,14 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public abstract class BaseDbStorage<T> implements Storage<T> {
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
+    
+    protected BaseDbStorage(JdbcTemplate jdbc, RowMapper<T> mapper) {
+        this.jdbc = jdbc;
+        this.mapper = mapper;
+    }
 
     protected Optional<T> findOne(String query, Object... params) {
         try {

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.EventDto;
 import ru.yandex.practicum.filmorate.dto.mapper.EventMapper;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.EventStorage;
 
 import java.util.List;
 
+@Primary
 @Service
 @RequiredArgsConstructor
 public class DefaultEventService implements EventService {

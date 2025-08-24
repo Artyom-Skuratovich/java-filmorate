@@ -69,13 +69,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findFilmRecommendations(int userId) {
-        // для in-memory реализации возвращаем пустой список
-        return List.of();
-    }
-
-
-    @Override
     public void delete(int id) {
         films.remove(id);
     }
