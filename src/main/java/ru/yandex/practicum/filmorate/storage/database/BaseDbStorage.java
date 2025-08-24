@@ -16,7 +16,7 @@ import java.util.Optional;
 public abstract class BaseDbStorage<T> implements Storage<T> {
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
-    
+
     protected BaseDbStorage(JdbcTemplate jdbc, RowMapper<T> mapper) {
         this.jdbc = jdbc;
         this.mapper = mapper;
