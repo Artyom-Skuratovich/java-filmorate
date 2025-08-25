@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.dto.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.update.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -26,6 +28,7 @@ public class ReviewService {
     private final UserStorage userStorage;
     @Qualifier("reviewDbStorage")
     private final ReviewStorage reviewStorage;
+    private final EventService eventService;
 
     public List<ReviewDto> findAll() {
         return reviewStorage.findAll()
@@ -52,6 +55,7 @@ public class ReviewService {
                 request.getUserId()
         ));
         Review review = reviewStorage.create(ReviewMapper.mapToReview(request));
+        eventService.create(request.getUserId(), review.getReviewId(), EventType.REVIEW, Operation.ADD);
         return ReviewMapper.mapToReviewDto(review);
     }
 
@@ -71,11 +75,17 @@ public class ReviewService {
             ));
         }
         review = reviewStorage.update(ReviewMapper.updateReviewProperties(review, request));
+        eventService.create(user.getId(), review.getReviewId(), EventType.REVIEW, Operation.UPDATE);
         return ReviewMapper.mapToReviewDto(review);
     }
 
     public void delete(int reviewId) {
+        Review review = StorageUtils.findModel(
+                reviewStorage, reviewId,
+                String.format("Отзыв с id=%d не найден", reviewId)
+        );
         reviewStorage.delete(reviewId);
+        eventService.create(review.getUserId(), reviewId, EventType.REVIEW, Operation.REMOVE);
     }
 
     public ReviewDto addLike(int reviewId, int userId) {
@@ -93,6 +103,7 @@ public class ReviewService {
         review.setUseful(review.getUseful() + 1);
         reviewStorage.update(review);
         reviewStorage.addLike(review.getReviewId(), user.getId());
+        eventService.create(userId, reviewId, EventType.LIKE, Operation.ADD);
         return ReviewMapper.mapToReviewDto(review);
     }
 
@@ -114,6 +125,7 @@ public class ReviewService {
         }
         review.setUseful(review.getUseful() - 1);
         reviewStorage.update(review);
+        eventService.create(userId, reviewId, EventType.LIKE, Operation.REMOVE);
         return ReviewMapper.mapToReviewDto(review);
     }
 

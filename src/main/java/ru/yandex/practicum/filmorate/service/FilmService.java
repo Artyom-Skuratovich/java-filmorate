@@ -25,6 +25,7 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
     private final DirectorStorage directorStorage;
+    private final EventService eventService;
 
     public List<FilmDto> findAll() {
         return filmStorage.findAll()
@@ -109,6 +110,7 @@ public class FilmService {
                 userId
         ));
         filmStorage.addLike(film.getId(), user.getId());
+        eventService.create(userId, filmId, EventType.LIKE, Operation.ADD);
         return buildDto(film);
     }
 
@@ -124,6 +126,7 @@ public class FilmService {
                     userId
             ));
         }
+        eventService.create(userId, filmId, EventType.LIKE, Operation.REMOVE);
         return buildDto(film);
     }
 
