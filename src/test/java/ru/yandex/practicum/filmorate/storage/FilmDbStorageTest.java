@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -9,8 +10,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.database.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.database.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.database.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,7 +32,10 @@ public class FilmDbStorageTest {
     private FilmDbStorage filmStorage;
     @Autowired
     private MpaDbStorage mpaStorage;
+    @Autowired
+    private UserDbStorage userStorage;
 
+    @BeforeEach
     @AfterEach
     public void clearDatabase() {
         List<Film> films = filmStorage.findAll();
@@ -54,5 +60,33 @@ public class FilmDbStorageTest {
 
         assertTrue(fromDb.isPresent());
         assertEquals(film.getName(), fromDb.get().getName());
+    }
+
+    @Test
+    public void shouldReturnOneMostPopularFilm() {
+        Optional<Mpa> optionalMpa = mpaStorage.findAll().stream().filter(m -> m.getName().equals("R")).findFirst();
+        assertTrue(optionalMpa.isPresent());
+        Mpa mpa = optionalMpa.get();
+
+        Film film = new Film();
+        film.setName("Побег из Шоушенка");
+        film.setDescription("Страх - это кандалы. Надежда - это свобода");
+        film.setDuration(144);
+        film.setReleaseDate(LocalDate.of(1994, 9, 10));
+        film.setMpaId(mpa.getId());
+
+        User user = new User();
+        user.setName("Mike");
+        user.setLogin("M1kie");
+        user.setEmail("mike@mail.ru");
+        user.setBirthday(LocalDate.now().minusYears(20));
+
+        film = filmStorage.create(film);
+        user = userStorage.create(user);
+        filmStorage.addLike(film.getId(), user.getId());
+
+        List<Film> mostPopular = filmStorage.findMostPopularFilms(1000, null, null);
+
+        assertEquals(1, mostPopular.size());
     }
 }

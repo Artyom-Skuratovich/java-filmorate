@@ -3,20 +3,23 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.CreateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateUserRequest;
+import ru.yandex.practicum.filmorate.dto.update.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.StorageUtils;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     @Qualifier("userDbStorage")
     private final UserStorage storage;
+    private final EventService eventService;
 
     public List<User> findAll() {
         return storage.findAll();
@@ -58,6 +61,7 @@ public class UserService {
                 friendId
         ));
         storage.addFriend(user.getId(), friend.getId());
+        eventService.create(userId, friendId, EventType.FRIEND, Operation.ADD);
         return user;
     }
 
@@ -71,6 +75,7 @@ public class UserService {
                 friendId
         ));
         storage.deleteFriend(user.getId(), friend.getId());
+        eventService.create(userId, friendId, EventType.FRIEND, Operation.REMOVE);
         return user;
     }
 

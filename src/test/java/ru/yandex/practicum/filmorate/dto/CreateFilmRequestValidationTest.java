@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import ru.yandex.practicum.filmorate.dto.create.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
