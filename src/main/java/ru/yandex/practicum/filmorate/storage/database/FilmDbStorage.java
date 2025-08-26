@@ -106,9 +106,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return findMany(query.toString(), params.toArray());
     }
 
-    @Override
-    public void addLike(int filmId, int userId) {
-        jdbc.update(ADD_LIKE_QUERY, filmId, userId);
+    public boolean addLike(int filmId, int userId) {
+        try {
+            return jdbc.update(ADD_LIKE_QUERY, filmId, userId) == 1;
+        } catch (org.springframework.dao.DuplicateKeyException ignore) {
+            return false;
+        }
     }
 
     @Override
@@ -175,7 +178,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
         if (sortOption == FilmSortOption.LIKES) {
             query.append("""
-                    JOIN likes l ON fd.film_id = l.film_id
+                    LEFT JOIN likes l ON fd.film_id = l.film_id
                     """);
             orderBy = "COUNT(l.film_id) DESC";
         }
@@ -191,35 +194,55 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public List<Film> search(String pattern, FilmSearchOption searchOption) {
-        StringBuilder query = new StringBuilder("""
-                SELECT f.*
-                FROM films f
-                """);
-        List<String> params = new ArrayList<>(2);
+    public List<Film> search(String pattern, FilmSearchOption opt) {
+        // подготавливаем шаблон
         pattern = "%" + pattern + "%";
+        List<Object> params = new ArrayList<>(2);
 
-        StringBuilder where = new StringBuilder("WHERE 1=1 AND (");
-        String condition = "";
+        StringBuilder sql = new StringBuilder("""
+        SELECT f.*
+        FROM (
+            SELECT f.id,
+                   COALESCE(lc.likes_cnt, 0) AS likes_cnt
+            FROM films f
+            LEFT JOIN (
+                SELECT film_id, COUNT(*) AS likes_cnt
+                FROM likes
+                GROUP BY film_id
+            ) lc ON lc.film_id = f.id
+        """);
 
-        if ((searchOption == FilmSearchOption.DIRECTOR) || (searchOption == FilmSearchOption.BOTH)) {
-            query.append("""
-                    LEFT JOIN films_directors fd ON f.id = fd.film_id
-                    LEFT JOIN directors d ON fd.director_id = d.id
-                    """);
-            where.append("(d.name IS NOT NULL AND LOWER(d.name) LIKE LOWER(?)) ");
-            condition = "OR";
-            params.add(pattern);
+        // опционально присоединяем режиссёров
+        boolean needDirector = (opt == FilmSearchOption.DIRECTOR) || (opt == FilmSearchOption.BOTH);
+        if (needDirector) {
+            sql.append("""
+            LEFT JOIN films_directors fd ON fd.film_id = f.id
+            LEFT JOIN directors d ON d.id = fd.id
+        """.replace("d.id = fd.id","d.id = fd.director_id"));
         }
 
-        if ((searchOption == FilmSearchOption.TITLE) || (searchOption == FilmSearchOption.BOTH)) {
-            where.append(String.format("%s LOWER(f.name) LIKE LOWER(?)", condition));
+        // WHERE с ИЛИ по выбранным полям
+        StringBuilder where = new StringBuilder("WHERE (");
+        String sep = "";
+        if (needDirector) {
+            where.append("(d.name IS NOT NULL AND LOWER(d.name) LIKE LOWER(?))");
+            params.add(pattern);
+            sep = " OR ";
+        }
+        boolean needTitle = (opt == FilmSearchOption.TITLE) || (opt == FilmSearchOption.BOTH);
+        if (needTitle) {
+            where.append(sep).append("LOWER(f.name) LIKE LOWER(?)");
             params.add(pattern);
         }
+        where.append(")\n");
 
-        query.append(where.append(')'));
+        sql.append(where)
+                .append("GROUP BY f.id, lc.likes_cnt\n")        // группируем только по id и количеству лайков
+                .append(") m\n")                                // закрыли подзапрос matched
+                .append("JOIN films f ON f.id = m.id\n")
+                .append("ORDER BY m.likes_cnt DESC, f.id ASC"); // сортировка по популярности
 
-        return findMany(query.toString(), params.toArray());
+        return findMany(sql.toString(), params.toArray());
     }
 
     @Override

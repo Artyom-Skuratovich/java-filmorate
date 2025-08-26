@@ -16,4 +16,6 @@ public interface ReviewStorage extends Storage<Review> {
     void addDislike(int reviewId, int userId);
 
     boolean deleteDislike(int reviewId, int userId);
+
+    void updateUseful(Review review);
 }

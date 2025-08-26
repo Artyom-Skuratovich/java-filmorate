@@ -9,3 +9,4 @@ public class StringToFilmSortOptionConverter implements Converter<String, FilmSo
         return FilmSortOption.valueOf(source.toUpperCase());
     }
 }
+

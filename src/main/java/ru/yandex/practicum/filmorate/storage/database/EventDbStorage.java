@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public class EventDbStorage extends BaseDbStorage<Event> implements EventStorage {
-    private static final String FIND_FOR_USER_QUERY = "SELECT * FROM events WHERE user_id = ?";
+    private static final String FIND_FOR_USER_QUERY = "SELECT * FROM events WHERE user_id = ? ORDER BY event_id;";
     private static final String CREATE_QUERY = """
             INSERT INTO events (timestamp, user_id, event_type, operation, entity_id)
             VALUES (?, ?, ?, ?, ?)

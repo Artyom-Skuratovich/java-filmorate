@@ -7,7 +7,7 @@ import java.util.List;
 public interface FilmStorage extends Storage<Film> {
     List<Film> findMostPopularFilms(int count, Integer genreId, Integer year);
 
-    void addLike(int filmId, int userId);
+    boolean addLike(int filmId, int userId);
 
     boolean deleteLike(int filmId, int userId);
 

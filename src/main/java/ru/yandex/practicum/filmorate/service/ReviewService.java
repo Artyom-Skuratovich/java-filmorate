@@ -68,14 +68,12 @@ public class ReviewService {
                 "Не удалось обновить отзыв, так как пользователя с id=%d не существует",
                 request.getUserId()
         ));
-        if (request.getUserId() != user.getId()) {
-            throw new NotFoundException(String.format(
-                    "Не удалось обновить отзыв так как пользователь с id=%d не автор отзыва",
-                    request.getUserId()
-            ));
-        }
-        review = reviewStorage.update(ReviewMapper.updateReviewProperties(review, request));
-        eventService.create(user.getId(), review.getReviewId(), EventType.REVIEW, Operation.UPDATE);
+        reviewStorage.update(ReviewMapper.updateReviewProperties(review, request));
+        review = StorageUtils.findModel(reviewStorage, review.getReviewId(), String.format(
+                "Отзыв с id=%d не найден",
+                review.getReviewId()
+        ));
+        eventService.create(review.getUserId(), review.getReviewId(), EventType.REVIEW, Operation.UPDATE);
         return ReviewMapper.mapToReviewDto(review);
     }
 
@@ -101,9 +99,12 @@ public class ReviewService {
             review.setUseful(review.getUseful() + 1);
         }
         review.setUseful(review.getUseful() + 1);
-        reviewStorage.update(review);
+        reviewStorage.updateUseful(review);
+        review = StorageUtils.findModel(reviewStorage, review.getReviewId(), String.format(
+                "Отзыв с id=%d не найден",
+                review.getReviewId()
+        ));
         reviewStorage.addLike(review.getReviewId(), user.getId());
-        eventService.create(userId, reviewId, EventType.LIKE, Operation.ADD);
         return ReviewMapper.mapToReviewDto(review);
     }
 
@@ -124,8 +125,11 @@ public class ReviewService {
             ));
         }
         review.setUseful(review.getUseful() - 1);
-        reviewStorage.update(review);
-        eventService.create(userId, reviewId, EventType.LIKE, Operation.REMOVE);
+        reviewStorage.updateUseful(review);
+        review = StorageUtils.findModel(reviewStorage, review.getReviewId(), String.format(
+                "Отзыв с id=%d не найден",
+                review.getReviewId()
+        ));
         return ReviewMapper.mapToReviewDto(review);
     }
 
@@ -142,7 +146,11 @@ public class ReviewService {
             review.setUseful(review.getUseful() - 1);
         }
         review.setUseful(review.getUseful() - 1);
-        reviewStorage.update(review);
+        reviewStorage.updateUseful(review);
+        review = StorageUtils.findModel(reviewStorage, review.getReviewId(), String.format(
+                "Отзыв с id=%d не найден",
+                review.getReviewId()
+        ));
         reviewStorage.addDislike(review.getReviewId(), user.getId());
         return ReviewMapper.mapToReviewDto(review);
     }
@@ -164,7 +172,11 @@ public class ReviewService {
             ));
         }
         review.setUseful(review.getUseful() + 1);
-        reviewStorage.update(review);
+        reviewStorage.updateUseful(review);
+        review = StorageUtils.findModel(reviewStorage, review.getReviewId(), String.format(
+                "Отзыв с id=%d не найден",
+                review.getReviewId()
+        ));
         return ReviewMapper.mapToReviewDto(review);
     }
 

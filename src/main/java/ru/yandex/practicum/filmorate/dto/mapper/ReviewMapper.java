@@ -34,9 +34,6 @@ public final class ReviewMapper {
     public static Review updateReviewProperties(Review review, UpdateReviewRequest request) {
         review.setContent(request.getContent());
         review.setIsPositive(request.getIsPositive());
-        review.setUserId(request.getUserId());
-        review.setFilmId(request.getFilmId());
-
         return review;
     }
 }

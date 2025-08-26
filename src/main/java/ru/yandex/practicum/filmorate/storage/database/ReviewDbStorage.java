@@ -17,17 +17,32 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
             SELECT *
             FROM reviews
             WHERE film_id = ?
+            ORDER BY
+                (useful > 0) DESC,
+                (useful = 0) DESC,
+                useful DESC,
+                id ASC
             LIMIT ?;
             """;
     private static final String FIND_ALL_FILMS_REVIEW_QUERY = """
             SELECT *
             FROM reviews
+            ORDER BY
+                (useful > 0) DESC,
+                (useful = 0) DESC,
+                useful DESC,
+                id ASC
             LIMIT ?;
             """;
     private static final String DELETE_QUERY = "DELETE FROM reviews WHERE id = ?";
     private static final String UPDATE_QUERY = """
             UPDATE reviews
-            SET content = ?, positive = ?, user_id = ?, film_id = ?, useful = ?
+            SET content = ?, positive = ?
+            WHERE id = ?
+            """;
+    private static final String UPDATE_USEFUL_QUERY = """
+            UPDATE reviews
+            SET useful = ?
             WHERE id = ?
             """;
     private static final String CREATE_QUERY = """
@@ -110,12 +125,18 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
                 UPDATE_QUERY,
                 model.getContent(),
                 model.getIsPositive(),
-                model.getUserId(),
-                model.getFilmId(),
-                model.getUseful(),
                 model.getReviewId()
         );
         return model;
+    }
+
+    @Override
+    public void updateUseful(Review model) {
+        update(
+                UPDATE_USEFUL_QUERY,
+                model.getUseful(),
+                model.getReviewId()
+        );
     }
 
     @Override

@@ -29,7 +29,8 @@ public class ReviewController {
 
     @PutMapping
     public ReviewDto update(@Valid @RequestBody UpdateReviewRequest request) {
-        log.info("PUT-запрос на обновление отзыва, id={}", request.getReviewId());
+        log.info("PUT-запрос на обновление отзыва, id={} для фильма id={} от пользователя id={}",
+                request.getReviewId(), request.getFilmId(), request.getUserId());
         ReviewDto updated = service.update(request);
         log.info("Отзыв с id={} успешно обновлён", updated.getReviewId());
         return updated;
