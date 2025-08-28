@@ -87,7 +87,10 @@ public class FilmService {
         }
         if (request.getDirectors() != null) {
             updateDirectorsForFilm(film.getId(), request.getDirectors());
+        } else {
+            updateDirectorsForFilm(film.getId(), Set.of());
         }
+
         return FilmMapper.mapToFilmDto(
                 film,
                 mpa,

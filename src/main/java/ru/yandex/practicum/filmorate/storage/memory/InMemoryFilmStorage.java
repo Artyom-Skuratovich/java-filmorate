@@ -28,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(int filmId, int userId) {
+    public boolean addLike(int filmId, int userId) {
         throw new UnsupportedOperationException();
     }
 
