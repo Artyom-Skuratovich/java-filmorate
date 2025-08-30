@@ -4,10 +4,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.create.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.update.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmSearchOption;
+import ru.yandex.practicum.filmorate.storage.FilmSortOption;
 
 import java.util.List;
 
@@ -65,11 +67,39 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<FilmDto> findMostPopularFilms(@RequestParam(required = false) Integer count) {
-        if ((count == null) || (count < 0)) {
-            count = 10;
-        }
-        log.info("GET-запрос на получение списка наиболее популярных фильмов, count={}", count);
-        return service.findMostPopularFilms(count);
+    public List<FilmDto> findMostPopularFilms(
+            @RequestParam(defaultValue = "10") Integer count,
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) Integer year) {
+        log.info("GET-запрос на получение популярных фильмов, count={}, genreId={}, year={}",
+                count, genreId, year);
+        return service.findMostPopularFilms(count, genreId, year);
+    }
+
+    @GetMapping("/common")
+    public List<FilmDto> findCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        log.info("GET-запрос на получение общих фильмов пользователей, userId={}, friendId={}",
+                userId, friendId);
+        return service.findCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> findDirectorFilmsSorted(
+            @PathVariable int directorId,
+            @RequestParam(name = "sortBy") FilmSortOption sortOption) {
+        log.info(
+                "GET-запрос на получение фильмов реж. сорт. по кол-ву лайков или г. вып/, directorId={}, sortOption={}",
+                directorId,
+                sortOption
+        );
+        return service.findDirectorFilmsSorted(directorId, sortOption);
+    }
+
+    @GetMapping("/search")
+    public List<FilmDto> search(
+            @RequestParam(name = "query") String pattern,
+            @RequestParam(name = "by") FilmSearchOption searchOption) {
+        log.info("GET-запрос на поиск по названию фильмов и по режиссёру, pattern={}, by={}", pattern, searchOption);
+        return service.search(pattern, searchOption);
     }
 }
