@@ -203,7 +203,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Override
     public List<Film> search(String pattern, FilmSearchOption searchOption) {
         pattern = "%" + pattern + "%";
-        List<Object> params = new ArrayList<>(2);
+        List<Object> params = new ArrayList<>(3);
 
         StringBuilder sql = new StringBuilder("""
                 SELECT f.*
@@ -235,7 +235,8 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         }
         boolean needTitle = (searchOption == FilmSearchOption.TITLE) || (searchOption == FilmSearchOption.BOTH);
         if (needTitle) {
-            where.append(sep).append("LOWER(f.name) LIKE LOWER(?)");
+            where.append(sep).append("(LOWER(f.name) LIKE LOWER(?) OR LOWER(f.description) LIKE LOWER(?))");
+            params.add(pattern);
             params.add(pattern);
         }
         where.append(")\n");
