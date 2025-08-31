@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dto;
+package ru.yandex.practicum.filmorate.dto.update;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -6,7 +6,10 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CreateUserRequest {
+public class UpdateUserRequest {
+    @NotNull
+    private Integer id;
+
     @NotNull
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Email имеет неверный формат")
